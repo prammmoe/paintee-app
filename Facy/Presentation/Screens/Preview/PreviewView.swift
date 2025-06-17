@@ -12,12 +12,12 @@ import RealityKit
 struct PreviewView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showTutorial = true
-    @StateObject private var coordinator = ARViewCoordinator() // pakai ARViewCoordinator
-
+//    @State private var isARActive = true  // <--- Tambahkan ini
+    
     var body: some View {
         ZStack {
-            // Unified Camera Manager's AR View as background
-            ARViewManager(coordinator: coordinator)
+            // AR View Container sebagai background
+            ARViewManager() // <--- Berikan binding state
                 .edgesIgnoringSafeArea(.all)
                 .blur(radius: showTutorial ? 10 : 0)
                 .animation(.easeInOut(duration: 0.3), value: showTutorial)
@@ -56,26 +56,11 @@ struct PreviewView: View {
             }
         }
         .onDisappear {
-//            cameraManager.stopAllSessions() // Stop all sessions when the view disappears
+//            isARActive = false // <--- Ini akan trigger ARViewContainer untuk stop session
         }
         .sheet(isPresented: $showTutorial) {
             TutorialSheetView()
         }
-    }
-}
-
-// Camera View to integrate UnifiedCameraManager
-struct CameraView: UIViewRepresentable {
-    let cameraManager: UnifiedCameraManager
-    
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: .zero)
-        cameraManager.setupARView(in: view) // Setup AR view
-        return view
-    }
-    
-    func updateUIView(_ uiView: UIView, context: Context) {
-        // No updates needed for now
     }
 }
 

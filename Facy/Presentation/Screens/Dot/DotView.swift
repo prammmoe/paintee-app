@@ -9,20 +9,20 @@ import Vision
 import AVFoundation
 
 // MARK: - Enhanced Face Detection View (Modified)
-
 struct DotView: View {
-    @StateObject private var coordinator = ARViewCoordinator() // pakai ARViewCoordinator
-
+    @StateObject private var cameraManager = UnifiedCameraManager() // Use the new manager
+    
     var body: some View {
         ZStack {
-            // AR Camera Preview (pakai ARView)
-            ARViewManager(coordinator: coordinator)
+            // Camera Preview (full screen, no overlay)
+            CameraPreview(cameraManager: cameraManager)
                 .ignoresSafeArea()
-
+            
+            // UI Elements
             VStack {
                 // Top warning area
                 VStack {
-                    Text(coordinator.warningMessage)
+                    Text(cameraManager.warningMessage)
                         .foregroundColor(.white)
                         .font(.system(size: 16, weight: .medium))
                         .multilineTextAlignment(.center)
@@ -32,42 +32,46 @@ struct DotView: View {
                         .padding(.horizontal, 20)
                 }
                 .padding(.top, 60)
-
+                
                 Spacer()
-
+                
                 // Bottom controls
                 VStack(spacing: 16) {
+                    // Status indicators
                     HStack(spacing: 20) {
                         StatusIndicator(
                             title: "Face",
-                            isGood: coordinator.faceDetected && !coordinator.faceMoving,
+                            isGood: cameraManager.faceDetected && !cameraManager.faceMoving,
                             icon: "face.smiling"
                         )
+                        
                         StatusIndicator(
                             title: "Device",
-                            isGood: !coordinator.deviceMoving,
+                            isGood: !cameraManager.deviceMoving,
                             icon: "iphone"
                         )
+                        
                         StatusIndicator(
                             title: "Light",
-                            isGood: coordinator.lightingGood,
+                            isGood: cameraManager.lightingGood,
                             icon: "sun.max"
                         )
                     }
                     .padding(.horizontal, 20)
-
+                    
+                    // Capture Button
                     Button(action: {
-                        coordinator.showSuccessAlert = true
+                        cameraManager.capturePhoto()
                     }) {
                         Text("Continue to drawing step")
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .background(coordinator.canCapture ? Color.green : Color.blue)
+                            .background(cameraManager.canCapture ? Color.green : Color.blue)
                             .cornerRadius(10)
                     }
-                    .disabled(!coordinator.canCapture)
+                    .disabled(!cameraManager.canCapture)
                     .padding(.horizontal, 20)
                 }
                 .padding(.bottom, 50)
@@ -75,22 +79,24 @@ struct DotView: View {
         }
         .navigationTitle("Position Your Face")
         .navigationBarTitleDisplayMode(.inline)
-        .onDisappear {
-//            coordinator.motionManager.stopAccelerometerUpdates()
+        .onAppear {
+            cameraManager.requestPermissionForCamera()
         }
-        .alert("Photo Captured", isPresented: $coordinator.showSuccessAlert) {
+        .onDisappear {
+            cameraManager.stopAllSessions() // Stop all sessions when the view disappears
+        }
+        .alert("Photo Captured", isPresented: $cameraManager.showSuccessAlert) {
             Button("OK") { }
         } message: {
             Text("Face captured successfully!")
         }
-        .alert("Error", isPresented: $coordinator.showErrorAlert) {
+        .alert("Error", isPresented: $cameraManager.showErrorAlert) {
             Button("OK") { }
         } message: {
-            Text(coordinator.errorMessage)
+            Text(cameraManager.errorMessage)
         }
     }
 }
-
 
 // MARK: - Status Indicator Component
 struct StatusIndicator: View {
@@ -115,6 +121,18 @@ struct StatusIndicator: View {
     }
 }
 
+// MARK: - Camera Preview Component
+struct CameraPreview: UIViewRepresentable {
+    let cameraManager: UnifiedCameraManager
+    
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        cameraManager.setupCameraPreview(in: view) // Setup camera preview
+        return view
+    }
+    
+    func updateUIView(_ uiView: UIView, context: Context) {}
+}
 
 #Preview {
     DotView()
