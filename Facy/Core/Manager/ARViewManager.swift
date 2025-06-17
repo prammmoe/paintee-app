@@ -8,111 +8,147 @@
 import SwiftUI
 import ARKit
 import RealityKit
+import SwiftUI
+import ARKit
+import RealityKit
+import Vision
+import CoreMotion
 
-// ARViewContainer dengan proper lifecycle management
-struct ARViewManager: UIViewRepresentable {
-//    @Binding var isActive: Bool
-    
-    func makeUIView(context: Context) -> ARSCNView {
-        let sceneView = ARSCNView(frame: .zero)
-        
-        guard ARFaceTrackingConfiguration.isSupported else { fatalError() }
-        sceneView.delegate = context.coordinator
-        
-        // Store reference to sceneView in coordinator
-        context.coordinator.sceneView = sceneView
-        
-        let configuration = ARFaceTrackingConfiguration()
-        sceneView.session.run(configuration)
-        
-        return sceneView
-    }
-    
-    func updateUIView(_ uiView: ARSCNView, context: Context) {
-//        if !isActive {
-//            uiView.session.pause()
-//            uiView.scene.rootNode.enumerateChildNodes { (node, _) in
-//                node.removeFromParentNode()
-//            }
-//        }
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator()
-    }
-    
-    // Called when the view is being removed
-    static func dismantleUIView(_ uiView: ARSCNView, coordinator: Coordinator) {
-        print("🔥 ARView dismantled, pausing session")
-        // Pause the AR session
-        uiView.session.pause()
-        
-        // Remove all child nodes
-        uiView.scene.rootNode.enumerateChildNodes { (node, _) in
-            node.removeFromParentNode()
-        }
-        
-        // Clear the delegate
-        uiView.delegate = nil
-    }
-    
-    class Coordinator: NSObject, ARSCNViewDelegate {
-        weak var sceneView: ARSCNView?
-        
-        deinit {
-            // Ensure session is paused when coordinator is deallocated
-            sceneView?.session.pause()
-        }
-        func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-            guard let device = renderer.device else {
-                return nil
-            }
-            guard let faceAnchor = anchor as? ARFaceAnchor else {
-                return nil
-            }
-            
-            let faceGeometry = ARSCNFaceGeometry(device: device)
-            let node = SCNNode(geometry: faceGeometry)
+class ARViewCoordinator: NSObject, ARSessionDelegate, ObservableObject {
+    @Published var warningMessage = "Position your face for setup before you start outlining"
+    @Published var canCapture = false
+    @Published var showSuccessAlert = false
+    @Published var showErrorAlert = false
+    @Published var errorMessage = ""
 
-            node.geometry?.firstMaterial?.fillMode = .lines
-            
-            for x in 0..<faceAnchor.geometry.vertices.count {
-                if x % 2 == 0 {
-                    let text = SCNText(string: "\(x)", extrusionDepth: 1)
-                    let textNode = SCNNode(geometry: text)
-                    textNode.scale = SCNVector3(x: 0.00025, y: 0.00025, z: 0.00025)
-                    textNode.name = "\(x)"
-                    
-                    // Set the text color to red
-                    textNode.geometry?.firstMaterial?.diffuse.contents = UIColor.red
-                    
-                    // Position the text node at the corresponding vertex
-                    let vertex = SCNVector3(faceAnchor.geometry.vertices[x])
-                    textNode.position = vertex
-                    
-                    node.addChildNode(textNode)
-                }
+    @Published var faceDetected = false
+    @Published var faceMoving = false
+    @Published var deviceMoving = false
+    @Published var lightingGood = true
+
+    private var facePositionHistory: [CGPoint] = []
+    private let motionManager = CMMotionManager()
+    private var lastAccelerometerData: CMAccelerometerData?
+
+    override init() {
+        super.init()
+        setupMotionDetection()
+    }
+
+    func setupMotionDetection() {
+        guard motionManager.isAccelerometerAvailable else { return }
+
+        motionManager.accelerometerUpdateInterval = 0.1
+        motionManager.startAccelerometerUpdates(to: .main) { [weak self] data, _ in
+            guard let self = self, let data = data else { return }
+
+            if let last = self.lastAccelerometerData {
+                let deltaX = abs(data.acceleration.x - last.acceleration.x)
+                let deltaY = abs(data.acceleration.y - last.acceleration.y)
+                let deltaZ = abs(data.acceleration.z - last.acceleration.z)
+
+                let total = deltaX + deltaY + deltaZ
+                self.deviceMoving = total > 0.3
             }
-            
-            return node
+
+            self.lastAccelerometerData = data
+            self.updateCaptureStatus()
         }
-        
-        func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
-            guard let faceAnchor = anchor as? ARFaceAnchor,
-                  let faceGeometry = node.geometry as? ARSCNFaceGeometry
-            else {
-                return
-            }
-            
-            faceGeometry.update(from: faceAnchor.geometry)
-        
-            for x in 0..<faceAnchor.geometry.vertices.count {
-                if x % 2 == 0 {
-                    let textNode = node.childNode(withName: "\(x)", recursively: false)
-                    let vertex = SCNVector3(faceAnchor.geometry.vertices[x])
-                    textNode?.position = vertex
+    }
+
+    func session(_ session: ARSession, didUpdate frame: ARFrame) {
+        detectLighting(frame: frame)
+        detectFace(frame: frame)
+    }
+
+    private func detectLighting(frame: ARFrame) {
+        let lightEstimate = frame.lightEstimate
+        lightingGood = lightEstimate?.ambientIntensity ?? 1000 > 200
+    }
+
+    private func detectFace(frame: ARFrame) {
+        let request = VNDetectFaceRectanglesRequest { [weak self] request, _ in
+            guard let self = self else { return }
+
+            DispatchQueue.main.async {
+                if let results = request.results as? [VNFaceObservation], let face = results.first {
+                    self.faceDetected = true
+                    let current = CGPoint(x: face.boundingBox.midX, y: face.boundingBox.midY)
+                    self.facePositionHistory.append(current)
+
+                    if self.facePositionHistory.count > 10 {
+                        self.facePositionHistory.removeFirst()
+                    }
+
+                    if self.facePositionHistory.count > 5 {
+                        let recent = Array(self.facePositionHistory.suffix(5))
+                        let avgX = recent.map { $0.x }.reduce(0, +) / Double(recent.count)
+                        let avgY = recent.map { $0.y }.reduce(0, +) / Double(recent.count)
+                        let variance = recent.map { pow($0.x - avgX, 2) + pow($0.y - avgY, 2) }.reduce(0, +) / Double(recent.count)
+                        self.faceMoving = variance > 0.001
+                    }
+                } else {
+                    self.faceDetected = false
+                    self.faceMoving = false
                 }
+
+                self.updateCaptureStatus()
             }
         }
+
+        let handler = VNImageRequestHandler(cvPixelBuffer: frame.capturedImage, orientation: .leftMirrored)
+        try? handler.perform([request])
+    }
+
+    private func updateCaptureStatus() {
+        let allGood = faceDetected && !faceMoving && !deviceMoving && lightingGood
+
+        DispatchQueue.main.async {
+            self.canCapture = allGood
+
+            let newMessage: String
+            if !self.faceDetected {
+                newMessage = "No face detected. Make sure your face is in screen."
+            } else if self.faceMoving {
+                newMessage = "Keep your face still."
+            } else if self.deviceMoving {
+                newMessage = "Keep device steady."
+            } else if !self.lightingGood {
+                newMessage = "Improve lighting conditions."
+            } else {
+                newMessage = "Perfect! Ready to draw."
+            }
+
+            if self.warningMessage != newMessage {
+                self.warningMessage = newMessage
+            }
+        }
+    }
+
+    deinit {
+        motionManager.stopAccelerometerUpdates()
     }
 }
+
+struct ARViewManager: UIViewRepresentable {
+    @ObservedObject var coordinator: ARViewCoordinator
+
+    func makeUIView(context: Context) -> ARView {
+        let arView = ARView(frame: .zero)
+        arView.session.delegate = coordinator
+
+        let configuration = ARFaceTrackingConfiguration()
+        configuration.isLightEstimationEnabled = true
+        arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+
+        return arView
+    }
+
+    func updateUIView(_ uiView: ARView, context: Context) {}
+
+    static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
+        uiView.session.pause()
+    }
+}
+
+
