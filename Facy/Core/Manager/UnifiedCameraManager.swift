@@ -1,8 +1,8 @@
 //
-//  EnhancedCameraManager.swift
+//  UnifiedCameraManager.swift
 //  Facy
 //
-//  Created by Pramuditha Muhammad Ikhwan on 16/06/25.
+//  Created by Pramuditha Muhammad Ikhwan on 17/06/25.
 //
 
 /**
@@ -10,17 +10,20 @@
  */
 
 import SwiftUI
+import ARKit
+import RealityKit
 import CoreMotion
 import Vision
 import AVFoundation
 
-// MARK: - Enhanced Camera Manager
-class EnhancedCameraManager: NSObject, ObservableObject {
+// MARK: - Unified Camera Manager
+class UnifiedCameraManager: NSObject, ObservableObject {
+    // Published properties for UI updates
     @Published var warningMessage = "Position your face for setup before you start outlining"
     @Published var canCapture = false
     @Published var showSuccessAlert = false
     @Published var showErrorAlert = false
-    @Published var errorMessage = "" // TODO: Define default error message
+    @Published var errorMessage = ""
     
     // Detection states
     @Published var faceDetected = false
@@ -28,7 +31,8 @@ class EnhancedCameraManager: NSObject, ObservableObject {
     @Published var deviceMoving = false
     @Published var lightingGood = true
     
-    // AVFoundation setup
+    // ARKit and AVFoundation setup
+    private var arSceneView: ARSCNView?
     private var captureSession: AVCaptureSession?
     private var previewLayer: AVCaptureVideoPreviewLayer?
     private var photoOutput: AVCapturePhotoOutput?
@@ -46,6 +50,22 @@ class EnhancedCameraManager: NSObject, ObservableObject {
         setupMotionDetection()
     }
     
+    // MARK: - ARKit Setup
+    func setupARView(in view: UIView) {
+        guard ARFaceTrackingConfiguration.isSupported else {
+            fatalError("ARFaceTracking is not supported on this device.")
+        }
+        
+        let sceneView = ARSCNView(frame: view.bounds)
+        sceneView.delegate = self
+        view.addSubview(sceneView)
+        arSceneView = sceneView
+        
+        let configuration = ARFaceTrackingConfiguration()
+        sceneView.session.run(configuration)
+    }
+    
+    // MARK: - AVFoundation Setup
     func requestPermissionForCamera() {
         AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
             DispatchQueue.main.async {
@@ -63,8 +83,8 @@ class EnhancedCameraManager: NSObject, ObservableObject {
         captureSession = AVCaptureSession()
         captureSession?.sessionPreset = .photo
         
-        guard let backCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front),
-              let input = try? AVCaptureDeviceInput(device: backCamera) else {
+        guard let frontCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front),
+              let input = try? AVCaptureDeviceInput(device: frontCamera) else {
             errorMessage = "Unable to access camera"
             showErrorAlert = true
             return
@@ -77,27 +97,25 @@ class EnhancedCameraManager: NSObject, ObservableObject {
             captureSession?.addOutput(photoOutput)
         }
         
-        // Add video output for face detection
         let videoOutput = AVCaptureVideoDataOutput()
         videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoQueue"))
         captureSession?.addOutput(videoOutput)
         
-        // Start session in background thread
         DispatchQueue.global(qos: .userInitiated).async {
             self.captureSession?.startRunning()
         }
     }
-
-    func setupCamera(in view: UIView) {
+    
+    func setupCameraPreview(in view: UIView) {
         guard let captureSession = captureSession else { return }
         
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer?.frame = view.bounds
         previewLayer?.videoGravity = .resizeAspectFill
-        
         view.layer.addSublayer(previewLayer!)
     }
     
+    // MARK: - Motion Detection
     private func setupMotionDetection() {
         guard motionManager.isAccelerometerAvailable else { return }
         
@@ -111,7 +129,7 @@ class EnhancedCameraManager: NSObject, ObservableObject {
                 let deltaZ = abs(data.acceleration.z - lastData.acceleration.z)
                 
                 let totalDelta = deltaX + deltaY + deltaZ
-                self.deviceMoving = totalDelta > 0.3 // Threshold for device movement
+                self.deviceMoving = totalDelta > 0.3
             }
             
             self.lastAccelerometerData = data
@@ -119,6 +137,7 @@ class EnhancedCameraManager: NSObject, ObservableObject {
         }
     }
     
+    // MARK: - Capture Status
     private func updateCaptureStatus() {
         let allConditionsGood = faceDetected && !faceMoving && !deviceMoving && lightingGood
         
@@ -139,6 +158,7 @@ class EnhancedCameraManager: NSObject, ObservableObject {
         }
     }
     
+    // MARK: - Photo Capture
     func capturePhoto() {
         guard let photoOutput = photoOutput else { return }
         
@@ -146,18 +166,30 @@ class EnhancedCameraManager: NSObject, ObservableObject {
         photoOutput.capturePhoto(with: settings, delegate: self)
     }
     
-    func stopCamera() {
+    func stopAllSessions() {
+        arSceneView?.session.pause()
         captureSession?.stopRunning()
         motionManager.stopAccelerometerUpdates()
     }
     
     deinit {
-        stopCamera()
+        stopAllSessions()
     }
 }
 
-// MARK: - Camera Manager Extensions
-extension EnhancedCameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
+// MARK: - ARSCNViewDelegate
+extension UnifiedCameraManager: ARSCNViewDelegate {
+    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+        guard let faceAnchor = anchor as? ARFaceAnchor else { return nil }
+        
+        let node = SCNNode()
+        // Add custom AR content here (e.g., cheek paintings)
+        return node
+    }
+}
+
+// MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
+extension UnifiedCameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         
@@ -168,24 +200,21 @@ extension EnhancedCameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
                 if let results = request.results as? [VNFaceObservation], !results.isEmpty {
                     self.faceDetected = true
                     
-                    // Check face movement
                     if let firstFace = results.first {
                         let currentPosition = CGPoint(x: firstFace.boundingBox.midX, y: firstFace.boundingBox.midY)
                         self.facePositionHistory.append(currentPosition)
                         
-                        // Keep only recent positions
                         if self.facePositionHistory.count > 10 {
                             self.facePositionHistory.removeFirst()
                         }
                         
-                        // Check if face is moving
                         if self.facePositionHistory.count > 5 {
                             let recent = Array(self.facePositionHistory.suffix(5))
-                            let avgX = recent.map { $0.x }.reduce(0, +) / Double(recent.count)
-                            let avgY = recent.map { $0.y }.reduce(0, +) / Double(recent.count)
+                            let avgX = recent.map { $0.x }.reduce(0, +) / CGFloat(recent.count)
+                            let avgY = recent.map { $0.y }.reduce(0, +) / CGFloat(recent.count)
                             
-                            let variance = recent.map { pow($0.x - avgX, 2) + pow($0.y - avgY, 2) }.reduce(0, +) / Double(recent.count)
-                            self.faceMoving = variance > 0.001 // Movement threshold
+                            let variance = recent.map { pow($0.x - avgX, 2) + pow($0.y - avgY, 2) }.reduce(0, +) / CGFloat(recent.count)
+                            self.faceMoving = variance > 0.001
                         }
                     }
                 } else {
@@ -202,7 +231,8 @@ extension EnhancedCameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 }
 
-extension EnhancedCameraManager: AVCapturePhotoCaptureDelegate {
+// MARK: - AVCapturePhotoCaptureDelegate
+extension UnifiedCameraManager: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if error != nil {
             DispatchQueue.main.async {
