@@ -5,6 +5,10 @@
 //  Created by Pramuditha Muhammad Ikhwan on 14/06/25.
 //
 
+/**
+ MARK: Unused
+ */
+
 import SwiftUI
 import AVFoundation
 import Vision

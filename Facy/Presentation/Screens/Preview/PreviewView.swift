@@ -13,11 +13,12 @@ struct PreviewView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showTutorial = true
 //    @State private var isARActive = true  // <--- Tambahkan ini
-    
+    @StateObject private var coordinator = ARFacePaintCoordinator() // Use the new manager
+
     var body: some View {
         ZStack {
             // AR View Container sebagai background
-            ARViewManager() // <--- Berikan binding state
+            ARFacePaintManager(coordinator: coordinator) // <--- Berikan binding state
                 .edgesIgnoringSafeArea(.all)
                 .blur(radius: showTutorial ? 10 : 0)
                 .animation(.easeInOut(duration: 0.3), value: showTutorial)

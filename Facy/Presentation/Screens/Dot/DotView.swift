@@ -7,22 +7,21 @@
 import SwiftUI
 import Vision
 import AVFoundation
-
-// MARK: - Enhanced Face Detection View (Modified)
+// MARK: - Enhanced Face Detection View with AR Stars
 struct DotView: View {
-    @StateObject private var cameraManager = UnifiedCameraManager() // Use the new manager
+    @StateObject private var coordinator = ARFacePaintCoordinator()
     
     var body: some View {
         ZStack {
-            // Camera Preview (full screen, no overlay)
-            CameraPreview(cameraManager: cameraManager)
+            // AR Camera Preview with Stars (full screen)
+            ARFacePaintManager(coordinator: coordinator)
                 .ignoresSafeArea()
             
-            // UI Elements
+            // UI Elements Overlay
             VStack {
                 // Top warning area
                 VStack {
-                    Text(cameraManager.warningMessage)
+                    Text(coordinator.warningMessage)
                         .foregroundColor(.white)
                         .font(.system(size: 16, weight: .medium))
                         .multilineTextAlignment(.center)
@@ -41,37 +40,52 @@ struct DotView: View {
                     HStack(spacing: 20) {
                         StatusIndicator(
                             title: "Face",
-                            isGood: cameraManager.faceDetected && !cameraManager.faceMoving,
+                            isGood: coordinator.faceDetected && !coordinator.faceMoving,
                             icon: "face.smiling"
                         )
                         
                         StatusIndicator(
                             title: "Device",
-                            isGood: !cameraManager.deviceMoving,
+                            isGood: !coordinator.deviceMoving,
                             icon: "iphone"
                         )
                         
                         StatusIndicator(
                             title: "Light",
-                            isGood: cameraManager.lightingGood,
+                            isGood: coordinator.lightingGood,
                             icon: "sun.max"
                         )
                     }
                     .padding(.horizontal, 20)
                     
+                    // AR Status Indicator
+                    if coordinator.canCapture {
+                        HStack {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.yellow)
+                            Text("Stars Active!")
+                                .foregroundColor(.white)
+                                .font(.system(size: 14, weight: .medium))
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(Color.green.opacity(0.8))
+                        .cornerRadius(20)
+                    }
+                    
                     // Capture Button
                     Button(action: {
-                        cameraManager.capturePhoto()
+                        captureARPhoto()
                     }) {
                         Text("Continue to drawing step")
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .background(cameraManager.canCapture ? Color.green : Color.blue)
+                            .background(coordinator.canCapture ? Color.green : Color.blue)
                             .cornerRadius(10)
                     }
-                    .disabled(!cameraManager.canCapture)
+                    .disabled(!coordinator.canCapture)
                     .padding(.horizontal, 20)
                 }
                 .padding(.bottom, 50)
@@ -80,25 +94,32 @@ struct DotView: View {
         .navigationTitle("Position Your Face")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            cameraManager.requestPermissionForCamera()
+            // AR session starts automatically with ARFacePaintManager
         }
         .onDisappear {
-            cameraManager.stopAllSessions() // Stop all sessions when the view disappears
+            // AR session stops automatically when view disappears
         }
-        .alert("Photo Captured", isPresented: $cameraManager.showSuccessAlert) {
+        .alert("Photo Captured", isPresented: $coordinator.showSuccessAlert) {
             Button("OK") { }
         } message: {
-            Text("Face captured successfully!")
+            Text("Face with stars captured successfully!")
         }
-        .alert("Error", isPresented: $cameraManager.showErrorAlert) {
+        .alert("Error", isPresented: $coordinator.showErrorAlert) {
             Button("OK") { }
         } message: {
-            Text(cameraManager.errorMessage)
+            Text(coordinator.errorMessage)
         }
+    }
+    
+    // MARK: - AR Photo Capture Function
+    private func captureARPhoto() {
+        // We can implement AR scene capture here
+        // For now, we'll just trigger the success alert
+        coordinator.showSuccessAlert = true
     }
 }
 
-// MARK: - Status Indicator Component
+// MARK: - Status Indicator Component (unchanged)
 struct StatusIndicator: View {
     let title: String
     let isGood: Bool
@@ -121,18 +142,18 @@ struct StatusIndicator: View {
     }
 }
 
-// MARK: - Camera Preview Component
-struct CameraPreview: UIViewRepresentable {
-    let cameraManager: UnifiedCameraManager
-    
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        cameraManager.setupCameraPreview(in: view) // Setup camera preview
-        return view
-    }
-    
-    func updateUIView(_ uiView: UIView, context: Context) {}
-}
+//// MARK: - Camera Preview Component
+//struct CameraPreview: UIViewRepresentable {
+//    let cameraManager: UnifiedCameraManager
+//    
+//    func makeUIView(context: Context) -> UIView {
+//        let view = UIView()
+//        cameraManager.setupCameraPreview(in: view) // Setup camera preview
+//        return view
+//    }
+//    
+//    func updateUIView(_ uiView: UIView, context: Context) {}
+//}
 
 #Preview {
     DotView()
