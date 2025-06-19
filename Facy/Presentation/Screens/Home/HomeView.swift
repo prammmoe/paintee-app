@@ -70,6 +70,7 @@ struct DesignCard: View {
         )
     }
 }
+
 //
 //// Halaman preview AR yang akan dituju ketika card dengan star ditekan
 //struct DesignDetailView: View {

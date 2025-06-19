@@ -174,7 +174,7 @@ class ARFacePaintCoordinator: NSObject, ARSessionDelegate, ObservableObject, ARS
         let starPath = createStarPath()
         let starGeometry = SCNShape(path: starPath, extrusionDepth: 0.001)
         
-        // 🎨 Style star with bright yellow
+        // Style star with bright yellow
         starGeometry.firstMaterial?.diffuse.contents = UIColor.systemYellow
         starGeometry.firstMaterial?.emission.contents = UIColor.yellow
         starGeometry.firstMaterial?.specular.contents = UIColor.white
@@ -182,14 +182,14 @@ class ARFacePaintCoordinator: NSObject, ARSessionDelegate, ObservableObject, ARS
         let starNode = SCNNode(geometry: starGeometry)
         starNode.name = isLeftCheek ? "left_star" : "right_star"
 
-        // 📍 Position on cheek
+        // Position on cheek
         let cheekPosition = calculateCheekPosition(faceAnchor: faceAnchor, isLeftCheek: isLeftCheek)
         starNode.position = cheekPosition
 
-        // 🪄 Scale
+        // Scale
         starNode.scale = SCNVector3(0.015, 0.015, 0.015)
 
-        // 🎯 Rotation to face camera (appear flat forward)
+        // Rotation to face camera (appear flat forward)
         starNode.eulerAngles = SCNVector3(0, 0, 0)
 
         node.addChildNode(starNode)
@@ -204,59 +204,68 @@ class ARFacePaintCoordinator: NSObject, ARSessionDelegate, ObservableObject, ARS
         paintingNode.position = cheekPosition
     }
     
+    // Fungsi untuk menghitung posisi pipi kiri atau kanan berdasarkan ARFaceAnchor
     func calculateCheekPosition(faceAnchor: ARFaceAnchor, isLeftCheek: Bool) -> SCNVector3 {
-        // Vertices for left and right cheeks (approximate)
-        let leftCheekIndices = [454, 455, 456, 457, 476] // Approximate left cheek vertices
-        let rightCheekIndices = [874, 875, 876, 877, 894] // Approximate right cheek vertices
+        // Indeks vertex yang kira-kira mewakili pipi kiri dan kanan pada model wajah
+        let leftCheekIndices = [454, 455, 456, 457, 476]   // Indeks untuk pipi kiri
+        let rightCheekIndices = [874, 875, 876, 877, 894]  // Indeks untuk pipi kanan
         
+        // Pilih indeks sesuai parameter isLeftCheek
         let cheekIndices = isLeftCheek ? leftCheekIndices : rightCheekIndices
         
-        var totalPosition = SCNVector3(0, 0, 0)
-        var validVertices = 0
-        
+        var totalPosition = SCNVector3(0, 0, 0) // Menyimpan penjumlahan semua posisi vertex
+        var validVertices = 0 // Counter untuk vertex yang valid (ada dalam array)
+
+        // Iterasi setiap indeks pipi
         for index in cheekIndices {
+            // Pastikan indeks masih dalam jangkauan jumlah vertex
             if index < faceAnchor.geometry.vertices.count {
                 let vertex = faceAnchor.geometry.vertices[index]
+                // Tambahkan koordinat vertex ke total
                 totalPosition.x += vertex.x
                 totalPosition.y += vertex.y
                 totalPosition.z += vertex.z
                 validVertices += 1
             }
         }
-        
+
+        // Jika ada vertex yang valid, hitung rata-rata posisinya
         if validVertices > 0 {
             totalPosition.x /= Float(validVertices)
             totalPosition.y /= Float(validVertices)
             totalPosition.z /= Float(validVertices)
             
-            // Offset forward so it doesn't embed in the face
+            // Tambahkan offset kecil ke arah depan agar tidak tertanam di wajah
             totalPosition.z += 0.005
         }
-        
+
         return totalPosition
     }
-    
+
+    // Fungsi untuk membuat bentuk bintang menggunakan UIBezierPath
     func createStarPath() -> UIBezierPath {
         let starPath = UIBezierPath()
-        let center = CGPoint(x: 0, y: 0)
-        let outerRadius: CGFloat = 1.0
-        let innerRadius: CGFloat = 0.4
-        let numberOfPoints = 5
-        
+        let center = CGPoint(x: 0, y: 0) // Titik tengah bintang
+        let outerRadius: CGFloat = 1.0   // Radius untuk titik luar bintang
+        let innerRadius: CGFloat = 0.4   // Radius untuk titik dalam bintang
+        let numberOfPoints = 5           // Bintang dengan 5 ujung
+
+        // Loop untuk menggambar 10 titik (5 ujung dan 5 lekukan)
         for i in 0..<numberOfPoints * 2 {
-            let angle = CGFloat(i) * .pi / CGFloat(numberOfPoints)
-            let radius = i % 2 == 0 ? outerRadius : innerRadius
-            
+            let angle = CGFloat(i) * .pi / CGFloat(numberOfPoints) // Sudut untuk titik ke-i
+            let radius = i % 2 == 0 ? outerRadius : innerRadius    // Gunakan radius luar untuk ujung, dalam untuk lekukan
+
+            // Hitung koordinat titik dengan rotasi agar ujung menghadap ke atas
             let x = center.x + cos(angle - .pi/2) * radius
             let y = center.y + sin(angle - .pi/2) * radius
-            
+
             if i == 0 {
-                starPath.move(to: CGPoint(x: x, y: y))
+                starPath.move(to: CGPoint(x: x, y: y)) // Mulai dari titik pertama
             } else {
-                starPath.addLine(to: CGPoint(x: x, y: y))
+                starPath.addLine(to: CGPoint(x: x, y: y)) // Tambahkan garis ke titik berikutnya
             }
         }
-        
+
         starPath.close()
         return starPath
     }
@@ -264,6 +273,7 @@ class ARFacePaintCoordinator: NSObject, ARSessionDelegate, ObservableObject, ARS
     deinit {
         motionManager.stopAccelerometerUpdates()
         sceneView?.session.pause()
+        sceneView = nil // Remove AR session from memory
     }
 }
 
