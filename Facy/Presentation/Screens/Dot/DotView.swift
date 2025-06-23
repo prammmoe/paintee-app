@@ -36,27 +36,7 @@ struct DotView: View {
                 
                 // Bottom controls
                 VStack(spacing: 16) {
-                    // Status indicators
-                    HStack(spacing: 20) {
-                        StatusIndicator(
-                            title: "Face",
-                            isGood: coordinator.faceDetected && !coordinator.faceMoving,
-                            icon: "face.smiling"
-                        )
-                        
-                        StatusIndicator(
-                            title: "Device",
-                            isGood: !coordinator.deviceMoving,
-                            icon: "iphone"
-                        )
-                        
-                        StatusIndicator(
-                            title: "Light",
-                            isGood: coordinator.lightingGood,
-                            icon: "sun.max"
-                        )
-                    }
-                    .padding(.horizontal, 20)
+                
                     
                     // AR Status Indicator
                     if coordinator.canCapture {
@@ -77,7 +57,7 @@ struct DotView: View {
                     Button(action: {
                         captureARPhoto()
                     }) {
-                        Text("Continue to drawing step")
+                        Text("Continue")
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
