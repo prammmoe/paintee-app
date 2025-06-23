@@ -12,4 +12,6 @@ protocol FacePaintingService {
     func getAllFacePaintingAsset() -> [FacePaintingAsset]
     func getFacePaintingAssetById(id: UUID) -> FacePaintingAsset?
     func getFacePaintingAssetByName(name: String) -> FacePaintingAsset?
+    
+    // TODO: All operation will goes here
 }

@@ -19,4 +19,6 @@ class FacePaintingManager: FacePaintingService {
     func getFacePaintingAssetByName(name: String) -> FacePaintingAsset? {
         return staticFacePaintingAsset.first { $0.name.lowercased() == name.lowercased() }
     }
+    
+    // TODO: All face painting operation will goes here
 }
