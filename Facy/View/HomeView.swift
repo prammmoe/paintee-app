@@ -8,128 +8,115 @@
 import SwiftUI
 
 struct HomeView: View {
+    @ObservedObject var viewModel: HomeViewModel
+    
+//    var body: some View {
+//        NavigationStack {
+//            VStack(alignment: .leading) {
+//                Text("Choose your face painting design")
+//                    .font(.headline)
+//            }
+//            
+//            LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 14) {
+//                ForEach(viewModel.assets, id: \.id) { asset in
+//                    NavigationLink(destination: PreviewView()) {
+//                        DesignCard(asset: asset)
+//                    }
+//                    .buttonStyle(PlainButtonStyle())
+//                }
+//            }
+//            .padding(10)
+//        }
+//        .navigationTitle(Text("Design"))
+//        .navigationBarTitleDisplayMode(.large)
+//    }
+    
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading) {
-                Text("Choose your face painting design")
-                    .font(.headline)
-            }
-            
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 14) {
-                ForEach(0..<10) { index in
-                    // Hanya card pertama (index 0) yang memiliki star dan navigasi
-                    if index == 0 {
-                        NavigationLink(destination: PreviewView()) {
-                            DesignCard(hasStarImage: true)
+            ZStack {
+                LinearGradient(gradient: Gradient(colors: [Color(red: 34/255, green: 40/255, blue: 80/255), Color(red: 10/255, green: 20/255, blue: 50/255)]),
+                               startPoint: .topLeading,
+                               endPoint: .bottomTrailing)
+                .ignoresSafeArea()
+                
+                VStack(alignment: .leading, spacing: 5) {
+                    // Title
+                    Text("Face Painting Design Collection")
+                        .font(.system(size: 36, weight: .heavy))
+                        .foregroundColor(Color.orange)
+                        .padding(.top, 70)
+                        .padding(.horizontal, 15)
+                    
+                    // Subtitle
+                    Text("Choose our creative and easy-to-draw face painting design collection.")
+                        .font(.system(size: 18, weight: .light))
+                        .foregroundColor(.white)
+                        .padding([.top, .horizontal])
+                        .multilineTextAlignment(.leading)
+                        .padding(.leading, 1)
+                    
+                    // Grid
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 14) {
+                        ForEach(viewModel.assets, id: \.id) { asset in
+                            NavigationLink(destination: PreviewView()) {
+                                DesignCard(asset: asset)
+                            }
+                            .buttonStyle(PlainButtonStyle())
                         }
-                        .buttonStyle(PlainButtonStyle()) // Menghilangkan efek button default
-                    } else {
-                        DesignCard(hasStarImage: false)
                     }
+                    .padding(.top, 25)
+                    
+                    Spacer()
                 }
+                .padding(.horizontal, 15)
             }
-            .padding(10)
         }
-        .navigationTitle(Text("Design"))
-        .navigationBarTitleDisplayMode(.large)
     }
 }
 
 struct DesignCard: View {
-    let hasStarImage: Bool
+    let asset: FacePaintingAsset
     
     var body: some View {
-        VStack {
-            // Oval placeholder untuk wajah
-            Ellipse()
-                .fill(Color(.systemGray5))
-                .frame(width: 60, height: 80)
+//        VStack {
+//            Image(asset.previewImage)
+//                .resizable()
+//                .aspectRatio(contentMode: .fill)
+//                .frame(width: 60, height: 80)
+//                .clipShape(Ellipse())
+//                .overlay(
+//                    Ellipse()
+//                        .stroke(Color(.systemGray4), lineWidth: 1.5)
+//                )
+//        }
+//        .frame(maxWidth: .infinity)
+//        .frame(height: 120)
+//        .background(Color(.systemBackground))
+//        .clipShape(RoundedRectangle(cornerRadius: 16))
+        
+        ZStack(alignment: .bottom) {
+            Color.brown
+                .cornerRadius(25)
+            
+            Image(asset.previewImage)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 126, height: 161)
+                .padding(.bottom,15)
+            
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.orange)
+                .frame(width: 135, height: 30)
                 .overlay(
-                    Ellipse()
-                        .stroke(Color(.systemGray4), lineWidth: 1.5)
+                    Text(asset.name)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
                 )
-                .overlay(
-                    // Menampilkan star.png hanya jika hasStarImage true
-                    Group {
-                        if hasStarImage {
-                            Image("star")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 30, height: 30)
-                        }
-                    }
-                )
+                .padding(.trailing)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 120)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(hasStarImage ? Color.blue : Color(.systemGray4), lineWidth: 2)
-        )
+        .frame(width: 152, height: 184)
+        .shadow(radius: 5)
+        .padding(5)
     }
 }
 
-//
-//// Halaman preview AR yang akan dituju ketika card dengan star ditekan
-//struct DesignDetailView: View {
-//    @Environment(\.dismiss) private var dismiss
-//    @State private var showTutorial = true
-//    
-//    var body: some View {
-//        ZStack {
-//            // AR View Container sebagai background
-//            ARViewContainer()
-//                .edgesIgnoringSafeArea(.all)
-//                .blur(radius: showTutorial ? 10 : 0)
-//                .animation(.easeInOut(duration: 0.3), value: showTutorial)
-//            
-//            // Overlay controls di atas AR view
-//            VStack {
-//                Spacer()
-//                
-//                // Bottom control panel
-//                VStack(spacing: 12) {
-//                    NavigationLink(destination: FaceDetectionView()) {
-//                        Text("Continue with this design")
-//                            .font(.system(size: 17, weight: .semibold))
-//                            .foregroundColor(.white)
-//                            .frame(maxWidth: .infinity)
-//                            .frame(height: 50)
-//                            .background(Color.blue)
-//                            .cornerRadius(10)
-//                    }
-//                    .disabled(showTutorial)
-//                    .opacity(showTutorial ? 0.5 : 1.0)
-//                    .animation(.easeInOut(duration: 0.3), value: showTutorial)
-//                }
-//                .padding(.horizontal, 20)
-//                .padding(.bottom, 34)
-//            }
-//        }
-//        .navigationTitle("Star Design Preview")
-//        .navigationBarTitleDisplayMode(.inline)
-//        .navigationBarBackButtonHidden(false)
-//        .toolbar {
-//            ToolbarItem(placement: .navigationBarTrailing) {
-//                Button("Done") {
-//                    dismiss()
-//                }
-//                .foregroundColor(.white)
-//                .fontWeight(.semibold)
-//            }
-//        }
-//        .onDisappear {
-//            // Additional cleanup when view disappears
-//            // The ARViewContainer's dismantleUIView will handle the main cleanup
-//        }
-//        .sheet(isPresented: $showTutorial) {
-//            TutorialSheetView()
-//        }
-//    }
-//}
-
-#Preview {
-    HomeView()
-}

@@ -5,14 +5,29 @@
 //  Created by Pramuditha Muhammad Ikhwan on 23/06/25.
 //
 
-import SwiftUI
+import Foundation
+import Combine
 
-struct HomeViewModel: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+class HomeViewModel: ObservableObject {
+    @Published var assets: [FacePaintingAsset] = []
+    @Published var selectedAsset: FacePaintingAsset?
+
+    private let service: FacePaintingService
+
+    init(service: FacePaintingService) {
+        self.service = service
+        loadAllAssets()
     }
-}
 
-#Preview {
-    HomeViewModel()
+    func loadAllAssets() {
+        self.assets = service.getAllFacePaintingAsset()
+    }
+
+    func selectAsset(by id: UUID) {
+        selectedAsset = service.getFacePaintingAssetById(id: id)
+    }
+
+    func selectAsset(by name: String) {
+        selectedAsset = service.getFacePaintingAssetByName(name: name)
+    }
 }

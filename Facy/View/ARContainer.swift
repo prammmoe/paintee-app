@@ -10,19 +10,15 @@ import ARKit
 import RealityKit
 import Combine
 
-// MARK: - Enhanced FacePaintingView with ViewModel Integration
 class ARContainer: ARView {
     
     var subscription: Cancellable?
     var faceEntity: HasModel? = nil
     var sparklyNormalMap: TextureResource!
     
-    // Connection to ViewModel
+    // Connection to ViewModel (optional)
     weak var viewModel: DotViewModel?
     
-    // Star entities for face painting
-    private var leftStarEntity: ModelEntity?
-    private var rightStarEntity: ModelEntity?
     private var faceAnchor: AnchorEntity?
     
     static let sceneUnderstandingQuery = EntityQuery(where: .has(SceneUnderstandingComponent.self) && .has(ModelComponent.self))
@@ -39,15 +35,14 @@ class ARContainer: ARView {
     
     override var canBecomeFirstResponder: Bool { true }
     
-    func setup(with viewModel: DotViewModel) {
+    // Setup with optional ViewModel
+    func setup(with viewModel: DotViewModel? = nil) {
         self.viewModel = viewModel
         
-        // Load sparkly texture
         do {
             sparklyNormalMap = try TextureResource.load(named: "sparkly")
         } catch {
             print("Warning: Could not load sparkly texture: \(error)")
-            // Create a default normal map texture if needed
         }
         
         // Configure AR session
@@ -56,17 +51,14 @@ class ARContainer: ARView {
         session.delegate = self
         session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
         
-        // Subscribe to scene updates
         subscription = scene.subscribe(to: SceneEvents.Update.self, onUpdate)
         
-        // Create face anchor
         setupFaceAnchor()
     }
     
     private func setupFaceAnchor() {
         faceAnchor = AnchorEntity(.face)
         scene.addAnchor(faceAnchor!)
-        
     }
     
     private func updateFaceTextureFromAsset() {
@@ -87,7 +79,7 @@ class ARContainer: ARView {
     
     private func updateFaceEntityTextureUsing(cgImage: CGImage) {
         guard let faceEntity = self.faceEntity,
-              let faceTexture = try? TextureResource.generate(from: cgImage,
+              let faceTexture = try? TextureResource(image: cgImage,
                                                              options: .init(semantic: .color))
         else { return }
         
@@ -119,7 +111,6 @@ class ARContainer: ARView {
                 updateFaceTextureFromAsset()
             }
         }
-        
     }
 
     deinit {
@@ -128,11 +119,11 @@ class ARContainer: ARView {
     }
 }
 
-// MARK: - ARSessionDelegate Implementation
 extension ARContainer: ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        // Call ViewModel methods for face and lighting detection
+        // Call ViewModel methods for face and lighting detection if ViewModel exists
         viewModel?.detectLighting(frame: frame)
         viewModel?.detectFace(frame: frame)
     }
 }
+
