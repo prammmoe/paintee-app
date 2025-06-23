@@ -11,7 +11,10 @@ import SwiftUI
 struct FacyApp: App {
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            let facePaintingManager: FacePaintingService = FacePaintingManager()
+            let viewModel = HomeViewModel(service: facePaintingManager)
+            
+            HomeView(viewModel: viewModel)
         }
     }
 }

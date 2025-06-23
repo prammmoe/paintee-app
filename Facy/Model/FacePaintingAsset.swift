@@ -7,12 +7,33 @@
 
 import SwiftUI
 
-struct FacePaintingAsset: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
+struct FacePaintingAsset: Equatable, Identifiable {
+    var id = UUID()
+    var name: String
+    var previewImage: String
+    var dotPreviewImage: String
+    var outlinePreviewImage: String
 }
 
-#Preview {
-    FacePaintingAsset()
-}
+// Static Data
+let staticFacePaintingAsset: [FacePaintingAsset] = [
+    FacePaintingAsset(
+        name: "Clown",
+        previewImage: "clown",
+        dotPreviewImage: "circle.fill",
+        outlinePreviewImage: "circle.dashed"
+    ),
+    FacePaintingAsset(
+        name: "Halal Malaysia",
+        previewImage: "halalmy",
+        dotPreviewImage: "circle.fill",
+        outlinePreviewImage: "circle.dashed"
+    ),
+    FacePaintingAsset(
+        name: "Dragon Design",
+        previewImage: "dragon",
+        dotPreviewImage: "circle.fill",
+        outlinePreviewImage: "circle.dashed"
+    )
+]
+
