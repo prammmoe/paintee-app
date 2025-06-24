@@ -62,7 +62,7 @@ class ARContainer: ARView {
     }
     
     private func updateFaceTextureFromAsset() {
-        if let uiImage = UIImage(named: "halalmy"),
+        if let uiImage = UIImage(named: "tribal"),
            let cgImage = uiImage.cgImage,
            let flippedImage = flippedVertically(cgImage) {
             updateFaceEntityTextureUsing(cgImage: flippedImage)

@@ -34,6 +34,12 @@ let staticFacePaintingAsset: [FacePaintingAsset] = [
         previewImage: "dragon",
         dotPreviewImage: "circle.fill",
         outlinePreviewImage: "circle.dashed"
+    ),
+    FacePaintingAsset(
+        name: "Tribal Design",
+        previewImage: "tribal",
+        dotPreviewImage: "circle.fill",
+        outlinePreviewImage: "circle.dashed"
     )
 ]
 
