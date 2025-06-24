@@ -13,33 +13,32 @@ struct FacePaintingAsset: Equatable, Identifiable {
     var previewImage: String
     var dotPreviewImage: String
     var outlinePreviewImage: String
+    var homeImage: String
+    
+    static func dummyData() -> [FacePaintingAsset] {
+        return [
+            FacePaintingAsset(
+                name: "Clown",
+                previewImage: "clown",
+                dotPreviewImage: "circle.fill",
+                outlinePreviewImage: "circle.dashed",
+                homeImage: "design2"
+            ),
+            FacePaintingAsset(
+                name: "Tribal",
+                previewImage: "tribal",
+                dotPreviewImage: "circle.fill",
+                outlinePreviewImage: "circle.dashed",
+                homeImage: "design1"
+            ),
+            FacePaintingAsset(
+                name: "Fox",
+                previewImage: "fox",
+                dotPreviewImage: "circle.fill",
+                outlinePreviewImage: "circle.dashed",
+                homeImage: "design3"
+            )
+        ]
+    }
 }
-
-// Static Data
-let staticFacePaintingAsset: [FacePaintingAsset] = [
-    FacePaintingAsset(
-        name: "Clown",
-        previewImage: "clown",
-        dotPreviewImage: "circle.fill",
-        outlinePreviewImage: "circle.dashed"
-    ),
-    FacePaintingAsset(
-        name: "Halal Malaysia",
-        previewImage: "halalmy",
-        dotPreviewImage: "circle.fill",
-        outlinePreviewImage: "circle.dashed"
-    ),
-    FacePaintingAsset(
-        name: "Dragon Design",
-        previewImage: "dragon",
-        dotPreviewImage: "circle.fill",
-        outlinePreviewImage: "circle.dashed"
-    ),
-    FacePaintingAsset(
-        name: "Tribal Design",
-        previewImage: "tribal",
-        dotPreviewImage: "circle.fill",
-        outlinePreviewImage: "circle.dashed"
-    )
-]
 

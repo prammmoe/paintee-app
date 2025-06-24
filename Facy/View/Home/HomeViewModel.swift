@@ -12,9 +12,9 @@ class HomeViewModel: ObservableObject {
     @Published var assets: [FacePaintingAsset] = []
     @Published var selectedAsset: FacePaintingAsset?
 
-    private let service: FacePaintingService
+    private let service: FacePaintingAssetServiceProtocol
 
-    init(service: FacePaintingService) {
+    init(service: FacePaintingAssetServiceProtocol = FacePaintingAssetServiceImpl()) {
         self.service = service
         loadAllAssets()
     }

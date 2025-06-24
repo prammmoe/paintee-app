@@ -10,14 +10,20 @@ import ARKit
 import RealityKit
 import Combine
 
-class ARContainer: ARView {
+class ARViewController: ARView {
     
     var subscription: Cancellable?
     var faceEntity: HasModel? = nil
     var sparklyNormalMap: TextureResource!
     
-    // Connection to ViewModel (optional)
-    weak var viewModel: DotViewModel?
+    var previewImage: String?
+    
+    // Tambahan: kontrol visibilitas desain
+    var isDesignVisible: Bool = true {
+        didSet {
+            updateFaceTextureFromAsset()
+        }
+    }
     
     private var faceAnchor: AnchorEntity?
     
@@ -36,8 +42,8 @@ class ARContainer: ARView {
     override var canBecomeFirstResponder: Bool { true }
     
     // Setup with optional ViewModel
-    func setup(with viewModel: DotViewModel? = nil) {
-        self.viewModel = viewModel
+    func setup(previewImage: String? = nil) {
+        self.previewImage = previewImage
         
         do {
             sparklyNormalMap = try TextureResource.load(named: "sparkly")
@@ -48,7 +54,6 @@ class ARContainer: ARView {
         // Configure AR session
         let configuration = ARFaceTrackingConfiguration()
         configuration.isLightEstimationEnabled = true
-        session.delegate = self
         session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
         
         subscription = scene.subscribe(to: SceneEvents.Update.self, onUpdate)
@@ -62,12 +67,24 @@ class ARContainer: ARView {
     }
     
     private func updateFaceTextureFromAsset() {
-        if let uiImage = UIImage(named: "tribal"),
-           let cgImage = uiImage.cgImage,
-           let flippedImage = flippedVertically(cgImage) {
-            updateFaceEntityTextureUsing(cgImage: flippedImage)
+        guard let faceEntity = self.faceEntity else { return }
+        
+        if isDesignVisible {
+            let assetName = previewImage ?? "halalmy"
+            
+            if let uiImage = UIImage(named: assetName),
+               let cgImage = uiImage.cgImage,
+               let flippedImage = flippedVertically(cgImage) {
+                updateFaceEntityTextureUsing(cgImage: flippedImage)
+            } else {
+                print("Warning: Couldn't load face texture asset")
+            }
         } else {
-            print("Warning: Couldn't load face texture asset")
+            // Hilangkan material desain dari wajah (buat transparan)
+            var faceMaterial = PhysicallyBasedMaterial()
+            faceMaterial.baseColor = .init(tint: .clear)
+            faceMaterial.blending = .transparent(opacity: .init(scale: 0.0))
+            faceEntity.model?.materials = [faceMaterial]
         }
     }
     
@@ -112,18 +129,30 @@ class ARContainer: ARView {
             }
         }
     }
+    
+    func stopSession() {
+        session.pause()
+        subscription?.cancel()
+        faceAnchor?.removeFromParent()
+        faceAnchor = nil
+        faceEntity = nil
+    }
 
     deinit {
         subscription?.cancel()
         session.pause()
     }
+    
+    // Tambahan: fungsi untuk mengatur visibilitas desain
+    func setDesignVisible(_ visible: Bool) {
+        isDesignVisible = visible
+    }
+    
+    func setPreviewVisibility(show: Bool) {
+        setDesignVisible(show)
+    }
+
+
 }
 
-extension ARContainer: ARSessionDelegate {
-    func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        // Call ViewModel methods for face and lighting detection if ViewModel exists
-        viewModel?.detectLighting(frame: frame)
-        viewModel?.detectFace(frame: frame)
-    }
-}
 

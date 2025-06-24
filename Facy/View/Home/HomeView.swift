@@ -8,29 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
-    @ObservedObject var viewModel: HomeViewModel
-    
-//    var body: some View {
-//        NavigationStack {
-//            VStack(alignment: .leading) {
-//                Text("Choose your face painting design")
-//                    .font(.headline)
-//            }
-//            
-//            LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 14) {
-//                ForEach(viewModel.assets, id: \.id) { asset in
-//                    NavigationLink(destination: PreviewView()) {
-//                        DesignCard(asset: asset)
-//                    }
-//                    .buttonStyle(PlainButtonStyle())
-//                }
-//            }
-//            .padding(10)
-//        }
-//        .navigationTitle(Text("Design"))
-//        .navigationBarTitleDisplayMode(.large)
-//    }
-    
+    @StateObject private var viewModel = HomeViewModel()
+        
     var body: some View {
         NavigationStack {
             ZStack {
@@ -41,15 +20,21 @@ struct HomeView: View {
                 
                 VStack(alignment: .leading, spacing: 5) {
                     // Title
-                    Text("Face Painting Design Collection")
+                    Text("Face Painting")
                         .font(.system(size: 36, weight: .heavy))
                         .foregroundColor(Color.orange)
                         .padding(.top, 70)
+                        .padding(.horizontal, 15)
+                    Text("Design Collection")
+                        .font(.system(size: 36, weight: .heavy))
+                        .foregroundColor(Color.lightBlue)
+//                        .padding(.top, 70)
                         .padding(.horizontal, 15)
                     
                     // Subtitle
                     Text("Choose our creative and easy-to-draw face painting design collection.")
                         .font(.system(size: 18, weight: .light))
+                        .fontWeight(.regular)
                         .foregroundColor(.white)
                         .padding([.top, .horizontal])
                         .multilineTextAlignment(.leading)
@@ -58,7 +43,7 @@ struct HomeView: View {
                     // Grid
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 14) {
                         ForEach(viewModel.assets, id: \.id) { asset in
-                            NavigationLink(destination: PreviewView()) {
+                            NavigationLink(destination: PreviewView(previewImage: asset.previewImage)) {
                                 DesignCard(asset: asset)
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -78,27 +63,17 @@ struct DesignCard: View {
     let asset: FacePaintingAsset
     
     var body: some View {
-//        VStack {
+        ZStack(alignment: .bottom) {
+            Color.lightYellow
+                .shadow(radius: 5)
+                .cornerRadius(25)
+//            ganti homeImage
 //            Image(asset.previewImage)
 //                .resizable()
-//                .aspectRatio(contentMode: .fill)
-//                .frame(width: 60, height: 80)
-//                .clipShape(Ellipse())
-//                .overlay(
-//                    Ellipse()
-//                        .stroke(Color(.systemGray4), lineWidth: 1.5)
-//                )
-//        }
-//        .frame(maxWidth: .infinity)
-//        .frame(height: 120)
-//        .background(Color(.systemBackground))
-//        .clipShape(RoundedRectangle(cornerRadius: 16))
-        
-        ZStack(alignment: .bottom) {
-            Color.brown
-                .cornerRadius(25)
-            
-            Image(asset.previewImage)
+//                .scaledToFit()
+//                .frame(width: 126, height: 161)
+//                .padding(.bottom,15)
+            Image(asset.homeImage)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 126, height: 161)
@@ -106,7 +81,7 @@ struct DesignCard: View {
             
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.orange)
-                .frame(width: 135, height: 30)
+                .frame(width: 140, height: 30)
                 .overlay(
                     Text(asset.name)
                         .font(.system(size: 20, weight: .bold))
@@ -115,8 +90,11 @@ struct DesignCard: View {
                 .padding(.trailing)
         }
         .frame(width: 152, height: 184)
-        .shadow(radius: 5)
+//        .shadow(radius: 5)
         .padding(5)
     }
+}
+#Preview {
+    HomeView()
 }
 
