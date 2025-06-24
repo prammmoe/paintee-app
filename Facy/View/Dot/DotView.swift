@@ -12,6 +12,8 @@ import RealityKit
 struct DotView: View {
     @StateObject private var viewModel = DotViewModel()
     let previewImage: String
+    
+    @EnvironmentObject private var router: Router
 
     var body: some View {
         ZStack {
@@ -56,19 +58,40 @@ struct DotView: View {
                     .padding(.horizontal, 20)
                     
                     // Capture Button
-                    Button(action: {
-                        viewModel.captureARPhoto()
-                    }) {
+//                    Button(action: {
+//                        viewModel.captureARPhoto()
+//                    }) {
+//                        Text("Continue to drawing step")
+//                            .font(.system(size: 17, weight: .semibold))
+//                            .foregroundColor(.white)
+//                            .frame(maxWidth: .infinity)
+//                            .frame(height: 50)
+//                            .background(viewModel.canCapture ? Color.green : Color.blue)
+//                            .cornerRadius(10)
+//                    }
+//                    .disabled(!viewModel.canCapture)
+//                    .padding(.horizontal, 20)
+//                    NavigationLink(destination: ConnectDotView(previewImage: previewImage)) {
+//                        Text("Continue to drawing step")
+//                            .font(.system(size: 17, weight: .semibold))
+//                            .foregroundColor(.white)
+//                            .frame(maxWidth: .infinity)
+//                            .frame(height: 50)
+//                            .background(Color.green)
+//                            .cornerRadius(10)
+//                    }
+                    
+                    Button {
+                        router.navigate(to: .connectdotview(previewImage: previewImage))
+                    } label: {
                         Text("Continue to drawing step")
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .background(viewModel.canCapture ? Color.green : Color.blue)
+                            .background(Color.green)
                             .cornerRadius(10)
                     }
-                    .disabled(!viewModel.canCapture)
-                    .padding(.horizontal, 20)
                 }
                 .padding(.bottom, 50)
             }

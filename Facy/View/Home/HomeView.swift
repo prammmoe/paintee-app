@@ -9,9 +9,10 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
+    @EnvironmentObject private var router: Router
         
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $router.path) {
             ZStack {
                 LinearGradient(gradient: Gradient(colors: [Color(red: 34/255, green: 40/255, blue: 80/255), Color(red: 10/255, green: 20/255, blue: 50/255)]),
                                startPoint: .topLeading,
@@ -37,10 +38,15 @@ struct HomeView: View {
                     // Grid
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 14) {
                         ForEach(viewModel.assets, id: \.id) { asset in
-                            NavigationLink(destination: PreviewView(previewImage: asset.previewImage)) {
+//                            NavigationLink(destination: PreviewView(previewImage: asset.previewImage)) {
+//                                DesignCard(asset: asset)
+//                            }
+//                            .buttonStyle(PlainButtonStyle())
+                            Button {
+                                router.navigate(to: .previewview(previewImage: asset.previewImage))
+                            } label: {
                                 DesignCard(asset: asset)
                             }
-                            .buttonStyle(PlainButtonStyle())
                         }
                     }
                     .padding(.top, 25)
@@ -48,6 +54,18 @@ struct HomeView: View {
                     Spacer()
                 }
                 .padding(.horizontal, 15)
+            }
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .previewview(let previewImage):
+                    PreviewView(previewImage: previewImage)
+                case .connectdotview(let previewImage):
+                    ConnectDotView(previewImage: previewImage)
+                case .drawingview(let previewImage):
+                    DrawingView(previewImage: previewImage)
+                case .dotview(let previewImage):
+                    DotView(previewImage: previewImage)
+                }
             }
         }
     }

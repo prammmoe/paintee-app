@@ -12,12 +12,12 @@ import RealityKit
 struct PreviewView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showTutorial = true
+    @EnvironmentObject private var router: Router
     
     let previewImage: String
 
     var body: some View {
         ZStack {
-            // ARView using Reality
             PreviewARViewContainer(previewImage: previewImage)
                 .edgesIgnoringSafeArea(.all)
             
@@ -25,7 +25,9 @@ struct PreviewView: View {
                 Spacer()
                 
                 VStack(spacing: 12) {
-                    NavigationLink(destination: DotView(previewImage: previewImage)) {
+                    Button {
+                        router.navigate(to: .dotview(previewImage: previewImage))
+                    } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)

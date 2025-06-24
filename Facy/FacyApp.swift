@@ -9,6 +9,7 @@ import SwiftUI
 
 @main
 struct FacyApp: App {
+    @StateObject private var router = Router()
     var body: some Scene {
         WindowGroup {
 //            let facePaintingManager: FacePaintingService = FacePaintingAssetManager()
@@ -17,5 +18,6 @@ struct FacyApp: App {
 //            HomeView(viewModel: viewModel)
             HomeView()
         }
+        .environmentObject(router)
     }
 }

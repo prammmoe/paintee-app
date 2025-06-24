@@ -1,23 +1,21 @@
 //
-//  ConnectDotView.swift
+//  DrawingView.swift
 //  Facy
 //
-//  Created by Pramuditha Muhammad Ikhwan on 23/06/25.
+//  Created by Pramuditha Muhammad Ikhwan on 24/06/25.
 //
 
 import SwiftUI
 import ARKit
 import RealityKit
 
-struct ConnectDotView: View {
+struct DrawingView: View {
     @Environment(\.dismiss) private var dismiss
     let previewImage: String
-    
-    @EnvironmentObject private var router: Router
 
     var body: some View {
         ZStack {
-            ConnectDotARViewContainer(previewImage: previewImage)
+            DrawingARViewContainer(previewImage: previewImage)
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
@@ -25,7 +23,7 @@ struct ConnectDotView: View {
                 
                 VStack(spacing: 12) {
                     Button {
-                        router.navigate(to: .drawingview(previewImage: previewImage))
+                        
                     } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .semibold))
@@ -58,7 +56,7 @@ struct ConnectDotView: View {
     }
 }
 
-struct ConnectDotARViewContainer: UIViewRepresentable {
+struct DrawingARViewContainer: UIViewRepresentable {
     let previewImage: String
     
     func makeUIView(context: Context) -> ARView {
@@ -77,4 +75,3 @@ struct ConnectDotARViewContainer: UIViewRepresentable {
         }
     }
 }
-
