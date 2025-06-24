@@ -7,13 +7,15 @@
 
 import SwiftUI
 import ARKit
+import RealityKit
 
 struct DotView: View {
     @StateObject private var viewModel = DotViewModel()
+    let previewImage: String
 
     var body: some View {
         ZStack {
-            DotARViewContainer(viewModel: viewModel)
+            DotARViewContainer(viewModel: viewModel, previewImage: previewImage)
                 .ignoresSafeArea(.all)
 
             VStack {
@@ -52,22 +54,7 @@ struct DotView: View {
                         )
                     }
                     .padding(.horizontal, 20)
-
-//                    // AR Status Indicator
-//                    if viewModel.canCapture {
-//                        HStack {
-//                            Image(systemName: "star.fill")
-//                                .foregroundColor(.yellow)
-//                            Text("Face !")
-//                                .foregroundColor(.white)
-//                                .font(.system(size: 14, weight: .medium))
-//                        }
-//                        .padding(.horizontal, 16)
-//                        .padding(.vertical, 8)
-//                        .background(Color.green.opacity(0.8))
-//                        .cornerRadius(20)
-//                    }
-
+                    
                     // Capture Button
                     Button(action: {
                         viewModel.captureARPhoto()
@@ -125,19 +112,40 @@ struct StatusIndicator: View {
 
 struct DotARViewContainer: UIViewRepresentable {
     @ObservedObject var viewModel: DotViewModel
+    let previewImage: String
     
-    func makeUIView(context: Context) -> ARContainer {
-        let arView = ARContainer(frame: .zero)
-        arView.setup(with: viewModel) // With VM
+    func makeUIView(context: Context) -> ARView {
+        let arView = ARViewController(frame: .zero)
+        arView.setup(previewImage: previewImage) // With VM
+        arView.session.delegate = context.coordinator
+        
         return arView
     }
     
-    func updateUIView(_ uiView: ARContainer, context: Context) {}
+    func updateUIView(_ uiView: ARView, context: Context) {}
     
-    static func dismantleUIView(_ uiView: ARContainer, coordinator: ()) {
-        uiView.session.pause()
-        uiView.subscription?.cancel()
-        uiView.faceEntity?.removeFromParent()
+    func makeCoordinator() -> Coordinator {
+        Coordinator(viewModel: viewModel)
+    }
+    
+    static func dismantleUIView(_ uiView: ARView, coordinator: Coordinator) {
+        if let customARView = uiView as? ARViewController {
+            customARView.stopSession()
+        } else {
+            uiView.session.pause()
+        }
+    }
+    
+    class Coordinator: NSObject, ARSessionDelegate {
+        let viewModel: DotViewModel
+        
+        init(viewModel: DotViewModel) {
+            self.viewModel = viewModel
+        }
+        
+        func session(_ session: ARSession, didUpdate frame: ARFrame) {
+            viewModel.analyzeFrame(frame)
+        }
     }
 }
 

@@ -8,10 +8,9 @@
 import Foundation
 import SwiftUI
 
-protocol FacePaintingService {
+// Repository
+protocol FacePaintingAssetServiceProtocol {
     func getAllFacePaintingAsset() -> [FacePaintingAsset]
     func getFacePaintingAssetById(id: UUID) -> FacePaintingAsset?
     func getFacePaintingAssetByName(name: String) -> FacePaintingAsset?
-
-    // TODO: All face painting operation will goes here
 }

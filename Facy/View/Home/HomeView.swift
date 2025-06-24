@@ -8,29 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
-    @ObservedObject var viewModel: HomeViewModel
-    
-//    var body: some View {
-//        NavigationStack {
-//            VStack(alignment: .leading) {
-//                Text("Choose your face painting design")
-//                    .font(.headline)
-//            }
-//            
-//            LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 14) {
-//                ForEach(viewModel.assets, id: \.id) { asset in
-//                    NavigationLink(destination: PreviewView()) {
-//                        DesignCard(asset: asset)
-//                    }
-//                    .buttonStyle(PlainButtonStyle())
-//                }
-//            }
-//            .padding(10)
-//        }
-//        .navigationTitle(Text("Design"))
-//        .navigationBarTitleDisplayMode(.large)
-//    }
-    
+    @StateObject private var viewModel = HomeViewModel()
+        
     var body: some View {
         NavigationStack {
             ZStack {
@@ -58,7 +37,7 @@ struct HomeView: View {
                     // Grid
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 14) {
                         ForEach(viewModel.assets, id: \.id) { asset in
-                            NavigationLink(destination: PreviewView()) {
+                            NavigationLink(destination: PreviewView(previewImage: asset.previewImage)) {
                                 DesignCard(asset: asset)
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -78,22 +57,6 @@ struct DesignCard: View {
     let asset: FacePaintingAsset
     
     var body: some View {
-//        VStack {
-//            Image(asset.previewImage)
-//                .resizable()
-//                .aspectRatio(contentMode: .fill)
-//                .frame(width: 60, height: 80)
-//                .clipShape(Ellipse())
-//                .overlay(
-//                    Ellipse()
-//                        .stroke(Color(.systemGray4), lineWidth: 1.5)
-//                )
-//        }
-//        .frame(maxWidth: .infinity)
-//        .frame(height: 120)
-//        .background(Color(.systemBackground))
-//        .clipShape(RoundedRectangle(cornerRadius: 16))
-        
         ZStack(alignment: .bottom) {
             Color.brown
                 .cornerRadius(25)

@@ -7,17 +7,20 @@
 
 import SwiftUI
 
-class FacePaintingManager: FacePaintingService {
+// Repository Implementation
+class FacePaintingAssetServiceImpl: FacePaintingAssetServiceProtocol {
+    let dummyData = FacePaintingAsset.dummyData()
+
     func getAllFacePaintingAsset() -> [FacePaintingAsset] {
-        return staticFacePaintingAsset
+        return dummyData
     }
 
     func getFacePaintingAssetById(id: UUID) -> FacePaintingAsset? {
-        return staticFacePaintingAsset.first { $0.id == id }
+        return dummyData.first { $0.id == id }
     }
 
     func getFacePaintingAssetByName(name: String) -> FacePaintingAsset? {
-        return staticFacePaintingAsset.first { $0.name.lowercased() == name.lowercased() }
+        return dummyData.first { $0.name.lowercased() == name.lowercased() }
     }
     
     // TODO: All face painting operation will goes here

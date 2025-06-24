@@ -12,26 +12,20 @@ import RealityKit
 struct PreviewView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showTutorial = true
-//    @State private var isARActive = true  // <--- Tambahkan ini
-//    @StateObject private var coordinator = ARFacePaintCoordinator() // Use the new manager
+    
+    let previewImage: String
 
     var body: some View {
         ZStack {
-            // AR View Container sebagai background
-//            ARViewContainer(coordinator: coordinator) // <--- Berikan binding state
-//                .edgesIgnoringSafeArea(.all)
-//                .blur(radius: showTutorial ? 10 : 0)
-//                .animation(.easeInOut(duration: 0.3), value: showTutorial)
-            
             // ARView using Reality
-            PreviewARViewContainer()
+            PreviewARViewContainer(previewImage: previewImage)
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
                 Spacer()
                 
                 VStack(spacing: 12) {
-                    NavigationLink(destination: DotView()) {
+                    NavigationLink(destination: DotView(previewImage: previewImage)) {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
@@ -51,15 +45,6 @@ struct PreviewView: View {
         .navigationTitle("Star Design Preview")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Done") {
-                    dismiss()
-                }
-                .foregroundColor(.white)
-                .fontWeight(.semibold)
-            }
-        }
         .onDisappear {
 //            isARActive = false // <--- Ini akan trigger ARViewContainer untuk stop session
         }
@@ -69,7 +54,6 @@ struct PreviewView: View {
     }
 }
 
-// Tutorial Sheet View
 struct TutorialSheetView: View {
     @Environment(\.dismiss) private var dismiss
     
@@ -120,18 +104,22 @@ struct TutorialSheetView: View {
 }
 
 struct PreviewARViewContainer: UIViewRepresentable {
+    let previewImage: String
     
-    func makeUIView(context: Context) -> ARContainer {
-        let arView = ARContainer(frame: .zero)
-        arView.setup() // Without VM
+    func makeUIView(context: Context) -> ARView {
+        let arView = ARViewController(frame: .zero)
+        arView.setup(previewImage: previewImage) // Without VM
         return arView
     }
     
-    func updateUIView(_ uiView: ARContainer, context: Context) {}
+    func updateUIView(_ uiView: ARView, context: Context) {}
     
-    static func dismantleUIView(_ uiView: ARContainer, coordinator: ()) {
-        uiView.session.pause()
-        uiView.subscription?.cancel()
-        uiView.faceEntity?.removeFromParent()
+    static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
+        if let customView = uiView as? ARViewController {
+            customView.stopSession()
+        } else {
+            uiView.session.pause()
+        }
     }
 }
+
