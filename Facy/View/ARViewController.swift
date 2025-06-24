@@ -10,14 +10,13 @@ import ARKit
 import RealityKit
 import Combine
 
-class ARContainer: ARView {
+class ARViewController: ARView {
     
     var subscription: Cancellable?
     var faceEntity: HasModel? = nil
     var sparklyNormalMap: TextureResource!
     
-    // Connection to ViewModel (optional)
-    weak var viewModel: DotViewModel?
+    var previewImage: String?
     
     private var faceAnchor: AnchorEntity?
     
@@ -36,8 +35,8 @@ class ARContainer: ARView {
     override var canBecomeFirstResponder: Bool { true }
     
     // Setup with optional ViewModel
-    func setup(with viewModel: DotViewModel? = nil) {
-        self.viewModel = viewModel
+    func setup(previewImage: String? = nil) {
+        self.previewImage = previewImage
         
         do {
             sparklyNormalMap = try TextureResource.load(named: "sparkly")
@@ -48,7 +47,6 @@ class ARContainer: ARView {
         // Configure AR session
         let configuration = ARFaceTrackingConfiguration()
         configuration.isLightEstimationEnabled = true
-        session.delegate = self
         session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
         
         subscription = scene.subscribe(to: SceneEvents.Update.self, onUpdate)
@@ -62,7 +60,9 @@ class ARContainer: ARView {
     }
     
     private func updateFaceTextureFromAsset() {
-        if let uiImage = UIImage(named: "halalmy"),
+        let assetName = previewImage ?? "halalmy"
+        
+        if let uiImage = UIImage(named: assetName),
            let cgImage = uiImage.cgImage,
            let flippedImage = flippedVertically(cgImage) {
             updateFaceEntityTextureUsing(cgImage: flippedImage)
@@ -112,6 +112,14 @@ class ARContainer: ARView {
             }
         }
     }
+    
+    func stopSession() {
+        session.pause()
+        subscription?.cancel()
+        faceAnchor?.removeFromParent()
+        faceAnchor = nil
+        faceEntity = nil
+    }
 
     deinit {
         subscription?.cancel()
@@ -119,11 +127,4 @@ class ARContainer: ARView {
     }
 }
 
-extension ARContainer: ARSessionDelegate {
-    func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        // Call ViewModel methods for face and lighting detection if ViewModel exists
-        viewModel?.detectLighting(frame: frame)
-        viewModel?.detectFace(frame: frame)
-    }
-}
 
