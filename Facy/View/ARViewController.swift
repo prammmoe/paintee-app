@@ -142,7 +142,7 @@ class ARViewController: ARView {
         subscription?.cancel()
         session.pause()
     }
-    
+  
     // Tambahan: fungsi untuk mengatur visibilitas desain
     func setDesignVisible(_ visible: Bool) {
         isDesignVisible = visible
@@ -151,8 +151,6 @@ class ARViewController: ARView {
     func setPreviewVisibility(show: Bool) {
         setDesignVisible(show)
     }
-
-
 }
 
 

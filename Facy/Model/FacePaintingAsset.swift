@@ -41,4 +41,3 @@ struct FacePaintingAsset: Equatable, Identifiable {
         ]
     }
 }
-

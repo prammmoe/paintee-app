@@ -20,11 +20,6 @@ struct HomeView: View {
                 
                 VStack(alignment: .leading, spacing: 5) {
                     // Title
-                    Text("Face Painting")
-                        .font(.system(size: 36, weight: .heavy))
-                        .foregroundColor(Color.orange)
-                        .padding(.top, 70)
-                        .padding(.horizontal, 15)
                     Text("Design Collection")
                         .font(.system(size: 36, weight: .heavy))
                         .foregroundColor(Color.lightBlue)
@@ -74,6 +69,7 @@ struct DesignCard: View {
 //                .frame(width: 126, height: 161)
 //                .padding(.bottom,15)
             Image(asset.homeImage)
+
                 .resizable()
                 .scaledToFit()
                 .frame(width: 126, height: 161)
@@ -94,6 +90,7 @@ struct DesignCard: View {
         .padding(5)
     }
 }
+
 #Preview {
     HomeView()
 }
