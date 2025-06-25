@@ -9,9 +9,10 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
+    @EnvironmentObject private var router: Router
         
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $router.path) {
             ZStack {
                 LinearGradient(gradient: Gradient(colors: [Color(red: 34/255, green: 40/255, blue: 80/255), Color(red: 10/255, green: 20/255, blue: 50/255)]),
                                startPoint: .topLeading,
@@ -19,14 +20,11 @@ struct HomeView: View {
                 .ignoresSafeArea()
                 
                 VStack(alignment: .leading, spacing: 5) {
-                    // Title
                     Text("Design Collection")
                         .font(.system(size: 36, weight: .heavy))
                         .foregroundColor(Color.lightBlue)
-//                        .padding(.top, 70)
                         .padding(.horizontal, 15)
                     
-                    // Subtitle
                     Text("Choose our creative and easy-to-draw face painting design collection.")
                         .font(.system(size: 18, weight: .light))
                         .fontWeight(.regular)
@@ -35,13 +33,13 @@ struct HomeView: View {
                         .multilineTextAlignment(.leading)
                         .padding(.leading, 1)
                     
-                    // Grid
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 14) {
                         ForEach(viewModel.assets, id: \.id) { asset in
-                            NavigationLink(destination: PreviewView(previewImage: asset.previewImage)) {
+                            Button {
+                                router.navigate(to: .previewview(asset: asset))
+                            } label: {
                                 DesignCard(asset: asset)
                             }
-                            .buttonStyle(PlainButtonStyle())
                         }
                     }
                     .padding(.top, 25)
@@ -50,9 +48,26 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 15)
             }
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .previewview(let asset):
+                    PreviewView(asset: asset)
+                case .calibrationview(let asset):
+                    CalibrationView(asset: asset)
+                case .dotview(let asset):
+                    DotView(asset: asset)
+                case .connectdotview(let asset):
+                    ConnectDotView(asset: asset)
+                case .drawingview(let asset):
+                    DrawingView(asset: asset)
+                case .camerasnapview:
+                    CameraSnapView()
+                }
+            }
         }
     }
 }
+    
 
 struct DesignCard: View {
     let asset: FacePaintingAsset
@@ -62,12 +77,6 @@ struct DesignCard: View {
             Color.lightYellow
                 .shadow(radius: 5)
                 .cornerRadius(25)
-//            ganti homeImage
-//            Image(asset.previewImage)
-//                .resizable()
-//                .scaledToFit()
-//                .frame(width: 126, height: 161)
-//                .padding(.bottom,15)
             Image(asset.homeImage)
 
                 .resizable()
@@ -86,7 +95,6 @@ struct DesignCard: View {
                 .padding(.trailing)
         }
         .frame(width: 152, height: 184)
-//        .shadow(radius: 5)
         .padding(5)
     }
 }

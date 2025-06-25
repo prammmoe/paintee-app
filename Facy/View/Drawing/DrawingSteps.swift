@@ -31,7 +31,7 @@ let drawingSteps: [DrawingStep] = [
 
 struct OnboardingDrawingStepsView: View {
     @State private var currentStep = 0
-
+    
     var body: some View {
         ZStack {
             Color("dark-blue").ignoresSafeArea()
@@ -44,7 +44,7 @@ struct OnboardingDrawingStepsView: View {
                         .font(.title2)
                         .bold()
                         .foregroundColor(.white)
-//                        .padding(.top, 10)
+                    //                        .padding(.top, 10)
                     Spacer()
                     Button("Lewati") { /* logic here */ }
                         .foregroundColor(.white)
@@ -52,7 +52,7 @@ struct OnboardingDrawingStepsView: View {
                 }
                 .padding(.horizontal)
                 .padding(.top, 20)
-
+                
                 TabView(selection: $currentStep) {
                     ForEach(0..<drawingSteps.count, id: \.self) { index in
                         let step = drawingSteps[index]
@@ -68,7 +68,7 @@ struct OnboardingDrawingStepsView: View {
                                 .foregroundColor(Color("dark-yellow"))
                                 .padding(.top, 20)
                                 .padding(.horizontal)
-
+                            
                             Text(step.subtitle)
                                 .font(.title3)
                                 .foregroundColor(.white)
@@ -79,43 +79,34 @@ struct OnboardingDrawingStepsView: View {
                     }
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-//                .frame(height: 420)
-
-//                HStack(spacing: 10) {
-//                    ForEach(0..<drawingSteps.count, id: \.self) { index in
-//                        Circle()
-//                            .fill(index == currentStep ? Color("yellow") : Color.gray.opacity(0.7))
-//                            .frame(width: 10, height: 10)
-//                    }
-//                }
-//                .padding(.top)
+                
                 if currentStep == drawingSteps.count - 1 {
-                                    Button(action: {
-                                        // action saat continue ditekan
-                                    }) {
-                                        Text("Continue")
-                                            .font(.headline)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.white)
-                                            .frame(maxWidth: .infinity)
-                                            .padding()
-                                            .background(Color("dark-yellow"))
-                                            .cornerRadius(15)
-                                            .padding(.horizontal)
-                                            .padding(.top)
-                                    }
-                                    .padding(.bottom, 40)
-                                } else {
-                                    HStack(spacing: 10) {
-                                        ForEach(0..<drawingSteps.count, id: \.self) { index in
-                                            Circle()
-                                                .fill(index == currentStep ? Color("dark-yellow") : Color.gray.opacity(0.7))
-                                                .frame(width: 10, height: 10)
-                                        }
-                                    }
-                                    .padding(.top)
-                                    .padding(.bottom, 40)
-                                }
+                    Button(action: {
+                        
+                    }) {
+                        Text("Continue")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color("dark-yellow"))
+                            .cornerRadius(15)
+                            .padding(.horizontal)
+                            .padding(.top)
+                    }
+                    .padding(.bottom, 40)
+                } else {
+                    HStack(spacing: 10) {
+                        ForEach(0..<drawingSteps.count, id: \.self) { index in
+                            Circle()
+                                .fill(index == currentStep ? Color("dark-yellow") : Color.gray.opacity(0.7))
+                                .frame(width: 10, height: 10)
+                        }
+                    }
+                    .padding(.top)
+                    .padding(.bottom, 40)
+                }
             }
         }
     }
