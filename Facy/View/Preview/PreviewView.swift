@@ -14,21 +14,12 @@ struct PreviewView: View {
     @State private var showTutorial = true
     @State private var showPreviewImage = true
     let previewImage: String
-
+    
     var body: some View {
         ZStack {
             // AR View with toggle-able preview overlay
             PreviewARViewContainer(previewImage: previewImage, showPreviewImage: showPreviewImage)
                 .edgesIgnoringSafeArea(.all)
-
-            VStack {
-
-                Spacer()
-
-            // ARView using Reality
-            PreviewARViewContainer(previewImage: previewImage)
-                .edgesIgnoringSafeArea(.all)
-            
             VStack {
                 Spacer()
                 
@@ -50,25 +41,25 @@ struct PreviewView: View {
                 .padding(.bottom, 30)
             }
         }
-//        .navigationTitle("Design Preview")
+        //        .navigationTitle("Design Preview")
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("Design Preview")
                     .font(.headline)
-                    .foregroundColor(.blue) 
+                    .foregroundColor(.blue)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
-                            Button(action: {
-                                showPreviewImage.toggle()
-                            }) {
-                                Image(systemName: "sparkles")
-                                    .font(.headline)
-                                    .foregroundColor(showPreviewImage ? Color.yellow : .white)
-                                    .padding(10)
-                                    .background(Color.black.opacity(0.5))
-                                    .clipShape(Circle())
-                            }
-                        }
+                Button(action: {
+                    showPreviewImage.toggle()
+                }) {
+                    Image(systemName: "sparkles")
+                        .font(.headline)
+                        .foregroundColor(showPreviewImage ? Color.yellow : .white)
+                        .padding(10)
+                        .background(Color.black.opacity(0.5))
+                        .clipShape(Circle())
+                }
+            }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
@@ -117,7 +108,7 @@ struct TutorialSheetView: View {
                     .frame(height: 50)
                     .background(Color.blue)
                     .cornerRadius(15)
-
+                
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 34)
@@ -131,14 +122,14 @@ struct TutorialSheetView: View {
 struct PreviewARViewContainer: UIViewRepresentable {
     let previewImage: String
     let showPreviewImage: Bool
-
+    
     func makeUIView(context: Context) -> ARView {
         let arView = ARViewController(frame: .zero)
         arView.setup(previewImage: previewImage)
         arView.setDesignVisible(showPreviewImage)
         return arView
     }
-
+    
     func updateUIView(_ uiView: ARView, context: Context) {
         if let arVC = uiView as? ARViewController {
             arVC.setDesignVisible(showPreviewImage)
