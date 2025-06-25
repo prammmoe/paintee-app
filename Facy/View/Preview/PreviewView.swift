@@ -14,11 +14,11 @@ struct PreviewView: View {
     @State private var showTutorial = true
     @EnvironmentObject private var router: Router
     
-    let previewImage: String
+    let asset: FacePaintingAsset
 
     var body: some View {
         ZStack {
-            PreviewARViewContainer(previewImage: previewImage)
+            PreviewARViewContainer(asset: asset)
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
@@ -26,7 +26,7 @@ struct PreviewView: View {
                 
                 VStack(spacing: 12) {
                     Button {
-                        router.navigate(to: .dotview(previewImage: previewImage))
+                        router.navigate(to: .dotview(asset: asset))
                     } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .semibold))
@@ -106,11 +106,11 @@ struct TutorialSheetView: View {
 }
 
 struct PreviewARViewContainer: UIViewRepresentable {
-    let previewImage: String
+    let asset: FacePaintingAsset
     
     func makeUIView(context: Context) -> ARView {
         let arView = ARViewController(frame: .zero)
-        arView.setup(previewImage: previewImage) // Without VM
+        arView.setup(asset: asset, assetType: .preview) // Without VM
         return arView
     }
     

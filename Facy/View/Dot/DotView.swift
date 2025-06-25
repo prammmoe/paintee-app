@@ -11,16 +11,22 @@ import RealityKit
 
 struct DotView: View {
     @StateObject private var viewModel = DotViewModel()
-    let previewImage: String
+    let asset: FacePaintingAsset
     
     @EnvironmentObject private var router: Router
 
     var body: some View {
         ZStack {
-            DotARViewContainer(viewModel: viewModel, previewImage: previewImage)
+            DotARViewContainer(viewModel: viewModel, asset: asset)
                 .ignoresSafeArea(.all)
 
             VStack {
+                Text("Step 1 of 3")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.black)
+                    .padding()
+                
                 VStack {
                     Text(viewModel.warningMessage)
                         .foregroundColor(.white)
@@ -56,35 +62,11 @@ struct DotView: View {
                         )
                     }
                     .padding(.horizontal, 20)
-                    
-                    // Capture Button
-//                    Button(action: {
-//                        viewModel.captureARPhoto()
-//                    }) {
-//                        Text("Continue to drawing step")
-//                            .font(.system(size: 17, weight: .semibold))
-//                            .foregroundColor(.white)
-//                            .frame(maxWidth: .infinity)
-//                            .frame(height: 50)
-//                            .background(viewModel.canCapture ? Color.green : Color.blue)
-//                            .cornerRadius(10)
-//                    }
-//                    .disabled(!viewModel.canCapture)
-//                    .padding(.horizontal, 20)
-//                    NavigationLink(destination: ConnectDotView(previewImage: previewImage)) {
-//                        Text("Continue to drawing step")
-//                            .font(.system(size: 17, weight: .semibold))
-//                            .foregroundColor(.white)
-//                            .frame(maxWidth: .infinity)
-//                            .frame(height: 50)
-//                            .background(Color.green)
-//                            .cornerRadius(10)
-//                    }
-                    
+    
                     Button {
-                        router.navigate(to: .connectdotview(previewImage: previewImage))
+                        router.navigate(to: .connectdotview(asset: asset))
                     } label: {
-                        Text("Continue to drawing step")
+                        Text("Continue")
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -135,11 +117,11 @@ struct StatusIndicator: View {
 
 struct DotARViewContainer: UIViewRepresentable {
     @ObservedObject var viewModel: DotViewModel
-    let previewImage: String
+    let asset: FacePaintingAsset
     
     func makeUIView(context: Context) -> ARView {
         let arView = ARViewController(frame: .zero)
-        arView.setup(previewImage: previewImage) // With VM
+        arView.setup(asset: asset, assetType: .preview)
         arView.session.delegate = context.coordinator
         
         return arView

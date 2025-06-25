@@ -11,21 +11,28 @@ import RealityKit
 
 struct DrawingView: View {
     @Environment(\.dismiss) private var dismiss
-    let previewImage: String
+    @EnvironmentObject private var router: Router
+    let asset: FacePaintingAsset
 
     var body: some View {
         ZStack {
-            DrawingARViewContainer(previewImage: previewImage)
+            DrawingARViewContainer(asset: asset)
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
+                Text("Step 3 of 3")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.black)
+                    .padding()
+                
                 Spacer()
                 
                 VStack(spacing: 12) {
                     Button {
-                        
+                        router.reset()
                     } label: {
-                        Text("Continue with this design")
+                        Text("Continue")
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -41,15 +48,6 @@ struct DrawingView: View {
         .navigationTitle("Star Design Preview")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Done") {
-                    dismiss()
-                }
-                .foregroundColor(.white)
-                .fontWeight(.semibold)
-            }
-        }
         .onDisappear {
             // TODO: State handling when view dismantled
         }
@@ -57,11 +55,11 @@ struct DrawingView: View {
 }
 
 struct DrawingARViewContainer: UIViewRepresentable {
-    let previewImage: String
+    let asset: FacePaintingAsset
     
     func makeUIView(context: Context) -> ARView {
         let arView = ARViewController(frame: .zero)
-        arView.setup(previewImage: previewImage) // Without VM
+        arView.setup(asset: asset, assetType: .preview) // Without VM
         return arView
     }
     

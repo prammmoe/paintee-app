@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FacePaintingAsset: Equatable, Identifiable {
+struct FacePaintingAsset: Hashable, Equatable, Identifiable {
     var id = UUID()
     var name: String
     var previewImage: String

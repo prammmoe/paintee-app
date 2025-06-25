@@ -11,21 +11,27 @@ import RealityKit
 
 struct ConnectDotView: View {
     @Environment(\.dismiss) private var dismiss
-    let previewImage: String
+    let asset: FacePaintingAsset
     
     @EnvironmentObject private var router: Router
 
     var body: some View {
         ZStack {
-            ConnectDotARViewContainer(previewImage: previewImage)
+            ConnectDotARViewContainer(asset: asset)
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
+                Text("Step 2 of 3")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.black)
+                    .padding()
+                
                 Spacer()
                 
                 VStack(spacing: 12) {
                     Button {
-                        router.navigate(to: .drawingview(previewImage: previewImage))
+                        router.navigate(to: .drawingview(asset: asset))
                     } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .semibold))
@@ -40,7 +46,7 @@ struct ConnectDotView: View {
                 .padding(.bottom, 34)
             }
         }
-        .navigationTitle("Star Design Preview")
+        .navigationTitle("Continue")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
         .toolbar {
@@ -59,11 +65,11 @@ struct ConnectDotView: View {
 }
 
 struct ConnectDotARViewContainer: UIViewRepresentable {
-    let previewImage: String
+    let asset: FacePaintingAsset
     
     func makeUIView(context: Context) -> ARView {
         let arView = ARViewController(frame: .zero)
-        arView.setup(previewImage: previewImage) // Without VM
+        arView.setup(asset: asset, assetType: .preview) 
         return arView
     }
     

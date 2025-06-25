@@ -10,13 +10,20 @@ import ARKit
 import RealityKit
 import Combine
 
+enum FacePaintingAssetType {
+    case preview
+    case dot
+    case outline
+}
+
 class ARViewController: ARView {
     
     var subscription: Cancellable?
     var faceEntity: HasModel? = nil
     var sparklyNormalMap: TextureResource!
     
-    var previewImage: String?
+    var asset: FacePaintingAsset?
+    var assetType: FacePaintingAssetType?
     
     private var faceAnchor: AnchorEntity?
     
@@ -35,8 +42,9 @@ class ARViewController: ARView {
     override var canBecomeFirstResponder: Bool { true }
     
     // Setup with optional ViewModel
-    func setup(previewImage: String? = nil) {
-        self.previewImage = previewImage
+    func setup(asset: FacePaintingAsset, assetType: FacePaintingAssetType) {
+        self.asset = asset
+        self.assetType = assetType
         
         do {
             sparklyNormalMap = try TextureResource.load(named: "sparkly")
@@ -60,15 +68,28 @@ class ARViewController: ARView {
     }
     
     private func updateFaceTextureFromAsset() {
-        let assetName = previewImage ?? "halalmy"
+        guard let asset = asset else { return }
         
-        if let uiImage = UIImage(named: assetName),
-           let cgImage = uiImage.cgImage,
-           let flippedImage = flippedVertically(cgImage) {
-            updateFaceEntityTextureUsing(cgImage: flippedImage)
-        } else {
-            print("Warning: Couldn't load face texture asset")
+        let assetName: String
+        switch assetType {
+        case .preview:
+            assetName = asset.previewImage
+        case .dot:
+            assetName = asset.dotPreviewImage
+        case .outline:
+            assetName = asset.outlinePreviewImage
+        default:
+            assetName = "halalmy"
         }
+        
+        guard let uiImage = UIImage(named: assetName),
+              let cgImage = uiImage.cgImage,
+              let flippedImage = flippedVertically(cgImage) else {
+            print("Warning: Couldn't load face texture asset")
+            return
+        }
+        
+        updateFaceEntityTextureUsing(cgImage: flippedImage)
     }
     
     private func flippedVertically(_ cgImage: CGImage) -> CGImage? {

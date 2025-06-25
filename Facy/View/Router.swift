@@ -8,10 +8,10 @@
 import SwiftUI
 
 enum Route: Hashable {
-    case previewview(previewImage: String)
-    case dotview(previewImage: String)
-    case connectdotview(previewImage: String)
-    case drawingview(previewImage: String)
+    case previewview(asset: FacePaintingAsset)
+    case dotview(asset: FacePaintingAsset)
+    case connectdotview(asset: FacePaintingAsset)
+    case drawingview(asset: FacePaintingAsset)
 }
 
 class Router: ObservableObject {

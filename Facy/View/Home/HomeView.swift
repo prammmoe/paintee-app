@@ -43,7 +43,7 @@ struct HomeView: View {
 //                            }
 //                            .buttonStyle(PlainButtonStyle())
                             Button {
-                                router.navigate(to: .previewview(previewImage: asset.previewImage))
+                                router.navigate(to: .previewview(asset: asset))
                             } label: {
                                 DesignCard(asset: asset)
                             }
@@ -57,14 +57,14 @@ struct HomeView: View {
             }
             .navigationDestination(for: Route.self) { route in
                 switch route {
-                case .previewview(let previewImage):
-                    PreviewView(previewImage: previewImage)
-                case .connectdotview(let previewImage):
-                    ConnectDotView(previewImage: previewImage)
-                case .drawingview(let previewImage):
-                    DrawingView(previewImage: previewImage)
-                case .dotview(let previewImage):
-                    DotView(previewImage: previewImage)
+                case .previewview(let asset):
+                    PreviewView(asset: asset)
+                case .connectdotview(let asset):
+                    ConnectDotView(asset: asset)
+                case .drawingview(let asset):
+                    DrawingView(asset: asset)
+                case .dotview(let asset):
+                    DotView(asset: asset)
                 }
             }
         }
