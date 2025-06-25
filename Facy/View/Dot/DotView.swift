@@ -21,12 +21,6 @@ struct DotView: View {
                 .ignoresSafeArea(.all)
 
             VStack {
-                Text("Step 1 of 3")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.black)
-                    .padding()
-                
                 VStack {
                     Text(viewModel.warningMessage)
                         .foregroundColor(.white)

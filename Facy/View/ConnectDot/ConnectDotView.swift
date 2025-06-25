@@ -21,12 +21,6 @@ struct ConnectDotView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
-                Text("Step 2 of 3")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.black)
-                    .padding()
-                
                 Spacer()
                 
                 VStack(spacing: 12) {

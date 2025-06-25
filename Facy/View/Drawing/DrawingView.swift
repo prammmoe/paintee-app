@@ -20,12 +20,6 @@ struct DrawingView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
-                Text("Step 3 of 3")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.black)
-                    .padding()
-                
                 Spacer()
                 
                 VStack(spacing: 12) {
