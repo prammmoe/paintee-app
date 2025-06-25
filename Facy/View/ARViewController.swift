@@ -18,6 +18,13 @@ class ARViewController: ARView {
     
     var previewImage: String?
     
+    // Tambahan: kontrol visibilitas desain
+    var isDesignVisible: Bool = true {
+        didSet {
+            updateFaceTextureFromAsset()
+        }
+    }
+    
     private var faceAnchor: AnchorEntity?
     
     static let sceneUnderstandingQuery = EntityQuery(where: .has(SceneUnderstandingComponent.self) && .has(ModelComponent.self))
@@ -60,14 +67,24 @@ class ARViewController: ARView {
     }
     
     private func updateFaceTextureFromAsset() {
-        let assetName = previewImage ?? "halalmy"
+        guard let faceEntity = self.faceEntity else { return }
         
-        if let uiImage = UIImage(named: assetName),
-           let cgImage = uiImage.cgImage,
-           let flippedImage = flippedVertically(cgImage) {
-            updateFaceEntityTextureUsing(cgImage: flippedImage)
+        if isDesignVisible {
+            let assetName = previewImage ?? "halalmy"
+            
+            if let uiImage = UIImage(named: assetName),
+               let cgImage = uiImage.cgImage,
+               let flippedImage = flippedVertically(cgImage) {
+                updateFaceEntityTextureUsing(cgImage: flippedImage)
+            } else {
+                print("Warning: Couldn't load face texture asset")
+            }
         } else {
-            print("Warning: Couldn't load face texture asset")
+            // Hilangkan material desain dari wajah (buat transparan)
+            var faceMaterial = PhysicallyBasedMaterial()
+            faceMaterial.baseColor = .init(tint: .clear)
+            faceMaterial.blending = .transparent(opacity: .init(scale: 0.0))
+            faceEntity.model?.materials = [faceMaterial]
         }
     }
     
@@ -124,6 +141,15 @@ class ARViewController: ARView {
     deinit {
         subscription?.cancel()
         session.pause()
+    }
+  
+    // Tambahan: fungsi untuk mengatur visibilitas desain
+    func setDesignVisible(_ visible: Bool) {
+        isDesignVisible = visible
+    }
+    
+    func setPreviewVisibility(show: Bool) {
+        setDesignVisible(show)
     }
 }
 

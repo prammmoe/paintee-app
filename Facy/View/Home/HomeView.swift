@@ -20,15 +20,16 @@ struct HomeView: View {
                 
                 VStack(alignment: .leading, spacing: 5) {
                     // Title
-                    Text("Face Painting Design Collection")
+                    Text("Design Collection")
                         .font(.system(size: 36, weight: .heavy))
-                        .foregroundColor(Color.orange)
-                        .padding(.top, 70)
+                        .foregroundColor(Color.lightBlue)
+//                        .padding(.top, 70)
                         .padding(.horizontal, 15)
                     
                     // Subtitle
                     Text("Choose our creative and easy-to-draw face painting design collection.")
                         .font(.system(size: 18, weight: .light))
+                        .fontWeight(.regular)
                         .foregroundColor(.white)
                         .padding([.top, .horizontal])
                         .multilineTextAlignment(.leading)
@@ -58,10 +59,17 @@ struct DesignCard: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            Color.brown
+            Color.lightYellow
+                .shadow(radius: 5)
                 .cornerRadius(25)
-            
-            Image(asset.previewImage)
+//            ganti homeImage
+//            Image(asset.previewImage)
+//                .resizable()
+//                .scaledToFit()
+//                .frame(width: 126, height: 161)
+//                .padding(.bottom,15)
+            Image(asset.homeImage)
+
                 .resizable()
                 .scaledToFit()
                 .frame(width: 126, height: 161)
@@ -69,7 +77,7 @@ struct DesignCard: View {
             
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.orange)
-                .frame(width: 135, height: 30)
+                .frame(width: 140, height: 30)
                 .overlay(
                     Text(asset.name)
                         .font(.system(size: 20, weight: .bold))
@@ -78,8 +86,12 @@ struct DesignCard: View {
                 .padding(.trailing)
         }
         .frame(width: 152, height: 184)
-        .shadow(radius: 5)
+//        .shadow(radius: 5)
         .padding(5)
     }
+}
+
+#Preview {
+    HomeView()
 }
 
