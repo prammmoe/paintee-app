@@ -15,10 +15,12 @@ struct CalibrationView: View {
     
     @EnvironmentObject private var router: Router
     @State private var navigateToStepOne = false
+    @State private var showPreviewImage = true
+
 
     var body: some View {
         ZStack {
-            CalibrationARViewContainer(viewModel: viewModel, asset: asset)
+            CalibrationARViewContainer(viewModel: viewModel, asset: asset, showPreviewImage: showPreviewImage)
                 .ignoresSafeArea(.all)
 
             VStack {
@@ -84,6 +86,18 @@ struct CalibrationView: View {
                     .font(.headline)
                     .foregroundColor(.blue)
             }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    showPreviewImage.toggle()
+                }) {
+                    Image(systemName: "sparkles")
+                        .font(.headline)
+                        .foregroundColor(showPreviewImage ? Color.yellow : .white)
+                        .padding(10)
+                        .background(Color.black.opacity(0.5))
+                        .clipShape(Circle())
+                }
+            }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
@@ -115,23 +129,27 @@ struct StatusIndicator: View {
 struct CalibrationARViewContainer: UIViewRepresentable {
     @ObservedObject var viewModel: CalibrationViewModel
     let asset: FacePaintingAsset
+    let showPreviewImage: Bool
     
     func makeUIView(context: Context) -> ARView {
-        let arView = ARViewController(frame: .zero)
+        let arView = CalibrationARView(frame: .zero)
         arView.setup(asset: asset, assetType: .preview)
         arView.session.delegate = context.coordinator
         
         return arView
     }
     
-    func updateUIView(_ uiView: ARView, context: Context) {}
-    
+    func updateUIView(_ uiView: ARView, context: Context) {
+        if let arVC = uiView as? CalibrationARView {
+            arVC.setDesignVisible(showPreviewImage)
+        }
+    }
     func makeCoordinator() -> Coordinator {
         Coordinator(viewModel: viewModel)
     }
     
     static func dismantleUIView(_ uiView: ARView, coordinator: Coordinator) {
-        if let customARView = uiView as? ARViewController {
+        if let customARView = uiView as? CalibrationARView {
             customARView.stopSession()
         } else {
             uiView.session.pause()

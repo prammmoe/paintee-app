@@ -29,30 +29,16 @@ let drawingSteps: [DrawingStep] = [
                 imageName: "connect")
 ]
 
-struct OnboardingDrawingStepsView: View {
+struct DrawingStepTutorialView: View {
+    @EnvironmentObject private var router: Router
     @State private var currentStep = 0
+    
+    let asset: FacePaintingAsset
     
     var body: some View {
         ZStack {
             Color("dark-blue").ignoresSafeArea()
             VStack {
-                HStack {
-                    Button("Back") { /* logic here */ }
-                        .foregroundColor(.white)
-                    Spacer()
-                    Text("Drawing Steps")
-                        .font(.title2)
-                        .bold()
-                        .foregroundColor(.white)
-                    //                        .padding(.top, 10)
-                    Spacer()
-                    Button("Lewati") { /* logic here */ }
-                        .foregroundColor(.white)
-                    
-                }
-                .padding(.horizontal)
-                .padding(.top, 20)
-                
                 TabView(selection: $currentStep) {
                     ForEach(0..<drawingSteps.count, id: \.self) { index in
                         let step = drawingSteps[index]
@@ -82,7 +68,7 @@ struct OnboardingDrawingStepsView: View {
                 
                 if currentStep == drawingSteps.count - 1 {
                     Button(action: {
-                        
+                        router.navigate(to: .calibrationview(asset: asset))
                     }) {
                         Text("Continue")
                             .font(.headline)
@@ -109,9 +95,15 @@ struct OnboardingDrawingStepsView: View {
                 }
             }
         }
+        .navigationTitle("Drawing Steps")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    router.navigate(to: .calibrationview(asset: asset))
+                } label: {
+                    Text("Lewati")
+                }
+            }
+        }
     }
-}
-
-#Preview {
-    OnboardingDrawingStepsView()
 }

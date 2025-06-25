@@ -16,6 +16,7 @@ struct PreviewView: View {
     @EnvironmentObject private var router: Router
     
     let asset: FacePaintingAsset
+    
     var body: some View {
         ZStack {
             // AR View with toggle-able preview overlay
@@ -26,7 +27,7 @@ struct PreviewView: View {
                 
                 VStack(spacing: 12) {
                     Button {
-                        router.navigate(to: .calibrationview(asset: asset))
+                        router.navigate(to: .drawingsteptutorialview(asset: asset))
                     } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .semibold))
@@ -126,15 +127,23 @@ struct PreviewARViewContainer: UIViewRepresentable {
     let showPreviewImage: Bool
 
     func makeUIView(context: Context) -> ARView {
-        let arView = ARViewController(frame: .zero)
+        let arView = PreviewARView(frame: .zero)
         arView.setup(asset: asset, assetType: .preview)
         arView.setDesignVisible(showPreviewImage)
         return arView
     }
     
     func updateUIView(_ uiView: ARView, context: Context) {
-        if let arVC = uiView as? ARViewController {
+        if let arVC = uiView as? PreviewARView {
             arVC.setDesignVisible(showPreviewImage)
+        }
+    }
+    
+    static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
+        if let customView = uiView as? PreviewARView {
+            customView.stopSession()
+        } else {
+            uiView.session.pause()
         }
     }
 }
