@@ -1,0 +1,109 @@
+//
+//  StepTwo.swift
+//  Facy
+//
+//  Created by Shafa Tiara Tsabita Himawan on 25/06/25.
+//
+
+import SwiftUI
+import ARKit
+import RealityKit
+
+struct ConnectDotView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var showPreviewImage = true
+    let asset: FacePaintingAsset
+    @EnvironmentObject private var router: Router
+        
+    var body: some View {
+        ZStack {
+            // AR View with toggle-able preview overlay
+            ConnectDotARViewContainer(asset: asset, showPreviewImage: showPreviewImage)
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack {
+                Text("Start connecting the dots and make the outline!")
+                    .font(.subheadline)
+                    .foregroundColor(.black)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color.orange.opacity(0.5))
+                    .cornerRadius(12)
+                    .padding(.top, 100)
+                
+                Spacer()
+            }
+            .ignoresSafeArea(edges: .top)
+            
+            VStack {
+                
+                Spacer()
+                
+                VStack(spacing: 12) {
+                    Button {
+                        router.navigate(to: .drawingview(asset: asset))
+                    } label: {
+                        Text("Continue")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(Color("dark-blue"))
+                            .cornerRadius(15)
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 30)
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Step 2 of 3")
+                    .font(.headline)
+                    .foregroundColor(.blue)
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    showPreviewImage.toggle()
+                }) {
+                    Image(systemName: "sparkles")
+                        .font(.headline)
+                        .foregroundColor(showPreviewImage ? Color.yellow : .white)
+                        .padding(10)
+                        .background(Color.black.opacity(0.5))
+                        .clipShape(Circle())
+                }
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(false)
+    }
+}
+
+struct ConnectDotARViewContainer: UIViewRepresentable {
+    let asset: FacePaintingAsset
+    let showPreviewImage: Bool
+    
+    func makeUIView(context: Context) -> ARView {
+        let arView = ARViewController(frame: .zero)
+        arView.setup(asset: asset, assetType: .preview)
+        return arView
+    }
+    
+    func updateUIView(_ uiView: ARView, context: Context) {
+        if let arVC = uiView as? ARViewController {
+            arVC.setDesignVisible(showPreviewImage)
+        }
+    }
+    static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
+        if let customView = uiView as? ARViewController {
+            customView.stopSession()
+        } else {
+            uiView.session.pause()
+        }
+    }
+}
+
+
+
