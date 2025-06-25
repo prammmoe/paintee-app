@@ -52,6 +52,8 @@ struct HomeView: View {
                 switch route {
                 case .previewview(let asset):
                     PreviewView(asset: asset)
+                case .drawingsteptutorialview(let asset):
+                    DrawingStepTutorialView(asset: asset)
                 case .calibrationview(let asset):
                     CalibrationView(asset: asset)
                 case .dotview(let asset):
