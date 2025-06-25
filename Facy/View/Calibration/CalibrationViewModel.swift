@@ -10,7 +10,7 @@ import Vision
 import ARKit
 import CoreMotion
 
-class DotViewModel: ObservableObject {
+class CalibrationViewModel: ObservableObject {
     @Published var warningMessage = "Position your face for setup before you start outlining"
     @Published var canCapture = false
     @Published var showSuccessAlert = false
@@ -58,7 +58,7 @@ class DotViewModel: ObservableObject {
         } else if !lightingGood {
             newMessage = "Improve lighting conditions."
         } else {
-            newMessage = "Perfect! Ready to draw. Face Paint is visible!"
+            newMessage = "Perfect! Ready to draw!"
         }
         
         if warningMessage != newMessage {

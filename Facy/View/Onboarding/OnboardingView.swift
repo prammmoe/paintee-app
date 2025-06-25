@@ -33,7 +33,7 @@ struct OnboardingView: View {
             
             VStack(alignment: .leading, spacing: 20) {
                             // Top Image
-                            Image("WomanFP") // Replace with your asset name
+                            Image("Woman FP") // Replace with your asset name
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 300, height: 300)

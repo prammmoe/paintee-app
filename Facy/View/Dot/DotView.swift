@@ -1,8 +1,8 @@
 //
-//  FaceDetectionView.swift
+//  StepOne.swift
 //  Facy
 //
-//  Created by Pramuditha Muhammad Ikhwan on 14/06/25.
+//  Created by Shafa Tiara Tsabita Himawan on 25/06/25.
 //
 
 import SwiftUI
@@ -10,53 +10,38 @@ import ARKit
 import RealityKit
 
 struct DotView: View {
-    @StateObject private var viewModel = DotViewModel()
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var router: Router
+    @State private var showTutorial = true
+    @State private var showPreviewImage = true
+    
     let asset: FacePaintingAsset
     
-    @EnvironmentObject private var router: Router
-
     var body: some View {
         ZStack {
-            DotARViewContainer(viewModel: viewModel, asset: asset)
-                .ignoresSafeArea(.all)
-
+            DotARViewContainer(asset: asset, showPreviewImage: showPreviewImage)
+                .edgesIgnoringSafeArea(.all)
+            
             VStack {
-                VStack {
-                    Text(viewModel.warningMessage)
-                        .foregroundColor(.white)
-                        .font(.system(size: 16, weight: .medium))
-                        .multilineTextAlignment(.center)
-                        .padding()
-                        .background(Color.black.opacity(0.7))
-                        .cornerRadius(12)
-                        .padding(.horizontal, 20)
-                }
-                .padding(.top, 60)
-
+                Text("Follow the dots and mark your face!")
+                    .font(.subheadline)
+                    .foregroundColor(.black)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color.orange.opacity(0.5))
+                    .cornerRadius(12)
+                    .padding(.top, 100)
+                
                 Spacer()
-
-                VStack(spacing: 16) {
-                    HStack(spacing: 20) {
-                        StatusIndicator(
-                            title: "Face",
-                            isGood: viewModel.faceDetected && !viewModel.faceMoving,
-                            icon: "face.smiling"
-                        )
-
-                        StatusIndicator(
-                            title: "Device",
-                            isGood: !viewModel.deviceMoving,
-                            icon: "iphone"
-                        )
-
-                        StatusIndicator(
-                            title: "Light",
-                            isGood: viewModel.lightingGood,
-                            icon: "sun.max"
-                        )
-                    }
-                    .padding(.horizontal, 20)
-    
+            }
+            .ignoresSafeArea(edges: .top)
+            
+            VStack {
+                
+                Spacer()
+                
+                VStack(spacing: 12) {
                     Button {
                         router.navigate(to: .connectdotview(asset: asset))
                     } label: {
@@ -65,86 +50,64 @@ struct DotView: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .background(Color.green)
-                            .cornerRadius(10)
+                            .background(Color("dark-blue"))
+                            .cornerRadius(15)
                     }
                 }
-                .padding(.bottom, 50)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 30)
             }
         }
-        .navigationTitle("Position Your Face")
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Step 1 of 3")
+                    .font(.headline)
+                    .foregroundColor(.blue)
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    showPreviewImage.toggle()
+                }) {
+                    Image(systemName: "sparkles")
+                        .font(.headline)
+                        .foregroundColor(showPreviewImage ? Color.yellow : .white)
+                        .padding(10)
+                        .background(Color.black.opacity(0.5))
+                        .clipShape(Circle())
+                }
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Photo Captured", isPresented: $viewModel.showSuccessAlert) {
-            Button("OK") { }
-        } message: {
-            Text("Face with stars captured successfully!")
-        }
-        .alert("Error", isPresented: $viewModel.showErrorAlert) {
-            Button("OK") { }
-        } message: {
-            Text(viewModel.errorMessage)
-        }
-    }
-}
-
-struct StatusIndicator: View {
-    let title: String
-    let isGood: Bool
-    let icon: String
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(isGood ? .green : .red)
-
-            Text(title)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(.white)
-        }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 12)
-        .background(Color.black.opacity(0.6))
-        .cornerRadius(8)
+        .navigationBarBackButtonHidden(false)
     }
 }
 
 struct DotARViewContainer: UIViewRepresentable {
-    @ObservedObject var viewModel: DotViewModel
     let asset: FacePaintingAsset
+    let showPreviewImage: Bool
     
     func makeUIView(context: Context) -> ARView {
         let arView = ARViewController(frame: .zero)
         arView.setup(asset: asset, assetType: .preview)
-        arView.session.delegate = context.coordinator
-        
+        arView.setDesignVisible(showPreviewImage)
         return arView
     }
     
-    func updateUIView(_ uiView: ARView, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(viewModel: viewModel)
+    func updateUIView(_ uiView: ARView, context: Context) {
+        if let arVC = uiView as? ARViewController {
+            arVC.setDesignVisible(showPreviewImage)
+        }
     }
     
-    static func dismantleUIView(_ uiView: ARView, coordinator: Coordinator) {
-        if let customARView = uiView as? ARViewController {
-            customARView.stopSession()
+    static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
+        if let customView = uiView as? ARViewController {
+            customView.stopSession()
         } else {
             uiView.session.pause()
         }
     }
-    
-    class Coordinator: NSObject, ARSessionDelegate {
-        let viewModel: DotViewModel
-        
-        init(viewModel: DotViewModel) {
-            self.viewModel = viewModel
-        }
-        
-        func session(_ session: ARSession, didUpdate frame: ARFrame) {
-            viewModel.analyzeFrame(frame)
-        }
-    }
 }
+
+
+
 

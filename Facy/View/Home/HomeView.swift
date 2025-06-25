@@ -20,28 +20,21 @@ struct HomeView: View {
                 .ignoresSafeArea()
                 
                 VStack(alignment: .leading, spacing: 5) {
-                    // Title
-                    Text("Face Painting Design Collection")
+                    Text("Design Collection")
                         .font(.system(size: 36, weight: .heavy))
-                        .foregroundColor(Color.orange)
-                        .padding(.top, 70)
+                        .foregroundColor(Color.lightBlue)
                         .padding(.horizontal, 15)
                     
-                    // Subtitle
                     Text("Choose our creative and easy-to-draw face painting design collection.")
                         .font(.system(size: 18, weight: .light))
+                        .fontWeight(.regular)
                         .foregroundColor(.white)
                         .padding([.top, .horizontal])
                         .multilineTextAlignment(.leading)
                         .padding(.leading, 1)
                     
-                    // Grid
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 14) {
                         ForEach(viewModel.assets, id: \.id) { asset in
-//                            NavigationLink(destination: PreviewView(previewImage: asset.previewImage)) {
-//                                DesignCard(asset: asset)
-//                            }
-//                            .buttonStyle(PlainButtonStyle())
                             Button {
                                 router.navigate(to: .previewview(asset: asset))
                             } label: {
@@ -59,27 +52,33 @@ struct HomeView: View {
                 switch route {
                 case .previewview(let asset):
                     PreviewView(asset: asset)
+                case .calibrationview(let asset):
+                    CalibrationView(asset: asset)
+                case .dotview(let asset):
+                    DotView(asset: asset)
                 case .connectdotview(let asset):
                     ConnectDotView(asset: asset)
                 case .drawingview(let asset):
                     DrawingView(asset: asset)
-                case .dotview(let asset):
-                    DotView(asset: asset)
+                case .camerasnapview:
+                    CameraSnapView()
                 }
             }
         }
     }
 }
+    
 
 struct DesignCard: View {
     let asset: FacePaintingAsset
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            Color.brown
+            Color.lightYellow
+                .shadow(radius: 5)
                 .cornerRadius(25)
-            
-            Image(asset.previewImage)
+            Image(asset.homeImage)
+
                 .resizable()
                 .scaledToFit()
                 .frame(width: 126, height: 161)
@@ -87,7 +86,7 @@ struct DesignCard: View {
             
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.orange)
-                .frame(width: 135, height: 30)
+                .frame(width: 140, height: 30)
                 .overlay(
                     Text(asset.name)
                         .font(.system(size: 20, weight: .bold))
@@ -96,8 +95,11 @@ struct DesignCard: View {
                 .padding(.trailing)
         }
         .frame(width: 152, height: 184)
-        .shadow(radius: 5)
         .padding(5)
     }
+}
+
+#Preview {
+    HomeView()
 }
 

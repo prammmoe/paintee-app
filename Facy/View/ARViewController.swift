@@ -25,6 +25,13 @@ class ARViewController: ARView {
     var asset: FacePaintingAsset?
     var assetType: FacePaintingAssetType?
     
+    // Tambahan: kontrol visibilitas desain
+    var isDesignVisible: Bool = true {
+        didSet {
+            updateFaceTextureFromAsset()
+        }
+    }
+    
     private var faceAnchor: AnchorEntity?
     
     static let sceneUnderstandingQuery = EntityQuery(where: .has(SceneUnderstandingComponent.self) && .has(ModelComponent.self))
@@ -69,27 +76,35 @@ class ARViewController: ARView {
     
     private func updateFaceTextureFromAsset() {
         guard let asset = asset else { return }
+        guard let faceEntity = self.faceEntity else { return }
         
-        let assetName: String
-        switch assetType {
-        case .preview:
-            assetName = asset.previewImage
-        case .dot:
-            assetName = asset.dotPreviewImage
-        case .outline:
-            assetName = asset.outlinePreviewImage
-        default:
-            assetName = "halalmy"
+        if isDesignVisible {
+            let assetName: String
+            switch assetType {
+            case .preview:
+                assetName = asset.previewImage
+            case .dot:
+                assetName = asset.dotPreviewImage
+            case .outline:
+                assetName = asset.outlinePreviewImage
+            default:
+                assetName = "halalmy"
+            }
+
+            if let uiImage = UIImage(named: assetName),
+               let cgImage = uiImage.cgImage,
+               let flippedImage = flippedVertically(cgImage) {
+                updateFaceEntityTextureUsing(cgImage: flippedImage)
+            } else {
+                print("Warning: Couldn't load face texture asset")
+            }
+        } else {
+            // Hilangkan material desain dari wajah (buat transparan)
+            var faceMaterial = PhysicallyBasedMaterial()
+            faceMaterial.baseColor = .init(tint: .clear)
+            faceMaterial.blending = .transparent(opacity: .init(scale: 0.0))
+            faceEntity.model?.materials = [faceMaterial]
         }
-        
-        guard let uiImage = UIImage(named: assetName),
-              let cgImage = uiImage.cgImage,
-              let flippedImage = flippedVertically(cgImage) else {
-            print("Warning: Couldn't load face texture asset")
-            return
-        }
-        
-        updateFaceEntityTextureUsing(cgImage: flippedImage)
     }
     
     private func flippedVertically(_ cgImage: CGImage) -> CGImage? {
@@ -145,6 +160,15 @@ class ARViewController: ARView {
     deinit {
         subscription?.cancel()
         session.pause()
+    }
+  
+    // Tambahan: fungsi untuk mengatur visibilitas desain
+    func setDesignVisible(_ visible: Bool) {
+        isDesignVisible = visible
+    }
+    
+    func setPreviewVisibility(show: Bool) {
+        setDesignVisible(show)
     }
 }
 

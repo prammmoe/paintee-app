@@ -12,44 +12,59 @@ import RealityKit
 struct PreviewView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showTutorial = true
+    @State private var showPreviewImage = true
     @EnvironmentObject private var router: Router
     
     let asset: FacePaintingAsset
-
     var body: some View {
         ZStack {
-            PreviewARViewContainer(asset: asset)
+            // AR View with toggle-able preview overlay
+            PreviewARViewContainer(asset: asset, showPreviewImage: showPreviewImage)
                 .edgesIgnoringSafeArea(.all)
-            
             VStack {
                 Spacer()
                 
                 VStack(spacing: 12) {
                     Button {
-                        router.navigate(to: .dotview(asset: asset))
+                        router.navigate(to: .calibrationview(asset: asset))
                     } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .background(Color.blue)
-                            .cornerRadius(10)
+                            .background(Color("dark-blue"))
+                            .cornerRadius(15)
                     }
                     .disabled(showTutorial)
                     .opacity(showTutorial ? 0.5 : 1.0)
                     .animation(.easeInOut(duration: 0.3), value: showTutorial)
                 }
                 .padding(.horizontal, 20)
-                .padding(.bottom, 34)
+                .padding(.bottom, 30)
             }
         }
-        .navigationTitle("Star Design Preview")
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Design Preview")
+                    .font(.headline)
+                    .foregroundColor(.blue)
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    showPreviewImage.toggle()
+                }) {
+                    Image(systemName: "sparkles")
+                        .font(.headline)
+                        .foregroundColor(showPreviewImage ? Color.yellow : .white)
+                        .padding(10)
+                        .background(Color.black.opacity(0.5))
+                        .clipShape(Circle())
+                }
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
-        .onDisappear {
-//            isARActive = false // <--- Ini akan trigger ARViewContainer untuk stop session
-        }
         .sheet(isPresented: $showTutorial) {
             TutorialSheetView()
         }
@@ -76,7 +91,7 @@ struct TutorialSheetView: View {
                     .multilineTextAlignment(.center)
                     .foregroundColor(.primary)
                 
-                Text("You can continue or try\ndifferent design")
+                Text("You can continue or try different design.\nThe colors shown are just inspiration, feel free to get creative!")
                     .font(.body)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.secondary)
@@ -94,7 +109,8 @@ struct TutorialSheetView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
                     .background(Color.blue)
-                    .cornerRadius(14)
+                    .cornerRadius(15)
+                
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 34)
@@ -107,21 +123,18 @@ struct TutorialSheetView: View {
 
 struct PreviewARViewContainer: UIViewRepresentable {
     let asset: FacePaintingAsset
-    
+    let showPreviewImage: Bool
+
     func makeUIView(context: Context) -> ARView {
         let arView = ARViewController(frame: .zero)
-        arView.setup(asset: asset, assetType: .preview) // Without VM
+        arView.setup(asset: asset, assetType: .preview)
+        arView.setDesignVisible(showPreviewImage)
         return arView
     }
     
-    func updateUIView(_ uiView: ARView, context: Context) {}
-    
-    static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
-        if let customView = uiView as? ARViewController {
-            customView.stopSession()
-        } else {
-            uiView.session.pause()
+    func updateUIView(_ uiView: ARView, context: Context) {
+        if let arVC = uiView as? ARViewController {
+            arVC.setDesignVisible(showPreviewImage)
         }
     }
 }
-
