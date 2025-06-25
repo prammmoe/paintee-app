@@ -50,26 +50,25 @@ struct HomeView: View {
             }
             .navigationDestination(for: Route.self) { route in
                 switch route {
-                case .previewview(let asset):
-                    PreviewView(asset: asset)
-                case .drawingsteptutorialview(let asset):
-                    DrawingStepTutorialView(asset: asset)
-                case .calibrationview(let asset):
-                    CalibrationView(asset: asset)
-                case .dotview(let asset):
-                    DotView(asset: asset)
-                case .connectdotview(let asset):
-                    ConnectDotView(asset: asset)
-                case .drawingview(let asset):
-                    DrawingView(asset: asset)
-                case .camerasnapview:
-                    CameraSnapView()
+                    case .previewview(let asset):
+                        PreviewView(asset: asset)
+                    case .drawingsteptutorialview(let asset):
+                        DrawingStepTutorialView(asset: asset)
+                    case .calibrationview(let asset):
+                        CalibrationView(asset: asset)
+                    case .dotview(let asset):
+                        DotView(asset: asset)
+                    case .connectdotview(let asset):
+                        ConnectDotView(asset: asset)
+                    case .drawingview(let asset):
+                        DrawingView(asset: asset)
+                    case .camerasnapview:
+                        CameraSnapView()
                 }
             }
         }
     }
 }
-    
 
 struct DesignCard: View {
     let asset: FacePaintingAsset

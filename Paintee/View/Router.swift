@@ -15,7 +15,6 @@ enum Route: Hashable {
     case connectdotview(asset: FacePaintingAsset)
     case drawingview(asset: FacePaintingAsset)
     case camerasnapview
-//    case previewcapture(image: UIImage)
 }
 
 class Router: ObservableObject {

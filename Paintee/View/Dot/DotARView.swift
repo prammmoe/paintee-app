@@ -10,13 +10,7 @@ import ARKit
 import RealityKit
 import Combine
 
-enum FacePaintingAssetType {
-    case preview
-    case dot
-    case outline
-}
-
-class ARViewController: ARView {
+class DotARView: ARView {
     
     var subscription: Cancellable?
     var faceEntity: HasModel? = nil
