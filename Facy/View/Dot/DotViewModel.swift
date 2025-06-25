@@ -58,7 +58,7 @@ class DotViewModel: ObservableObject {
         } else if !lightingGood {
             newMessage = "Improve lighting conditions."
         } else {
-            newMessage = "Perfect! Ready to draw. Face Paint is visible!"
+            newMessage = "Perfect! Ready to draw!"
         }
         
         if warningMessage != newMessage {
