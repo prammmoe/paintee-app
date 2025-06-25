@@ -12,20 +12,19 @@ struct PreviewCapture: View {
     let image: UIImage
     @Binding var capturedImage: UIImage?
     @State private var showSaveAlert = false
-
+    
     var body: some View {
         ZStack {
             Image(uiImage: image)
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
-
+            
             VStack {
                 Spacer()
-
+                
                 HStack(spacing: 16) {
                     Button(action: {
-                        // RETAKE
                         capturedImage = nil
                     }) {
                         Text("Retake")
@@ -35,7 +34,7 @@ struct PreviewCapture: View {
                             .font(.system(size: 16, weight: .semibold))
                             .cornerRadius(15)
                     }
-
+                    
                     Button(action: {
                         saveImageToGallery(image)
                     }) {
@@ -51,20 +50,6 @@ struct PreviewCapture: View {
                 .padding(.bottom, 40)
             }
         }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: HomeView()) {
-                        Text("Home")
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.blue)
-//                            .frame(maxWidth: .infinity)
-//                            .frame(height: 50)
-//                            .background(Color("dark-yellow"))
-//                            .cornerRadius(15)
-                }
-              
-            }
-        }
         .alert("Saved!", isPresented: $showSaveAlert) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -73,7 +58,7 @@ struct PreviewCapture: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
     }
-
+    
     private func saveImageToGallery(_ image: UIImage) {
         PHPhotoLibrary.requestAuthorization { status in
             if status == .authorized || status == .limited {

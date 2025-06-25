@@ -10,7 +10,7 @@ import Vision
 import ARKit
 import CoreMotion
 
-class DotViewModel: ObservableObject {
+class CalibrationViewModel: ObservableObject {
     @Published var warningMessage = "Position your face for setup before you start outlining"
     @Published var canCapture = false
     @Published var showSuccessAlert = false

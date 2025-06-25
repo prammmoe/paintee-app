@@ -10,13 +10,20 @@ import ARKit
 import RealityKit
 import Combine
 
+enum FacePaintingAssetType {
+    case preview
+    case dot
+    case outline
+}
+
 class ARViewController: ARView {
     
     var subscription: Cancellable?
     var faceEntity: HasModel? = nil
     var sparklyNormalMap: TextureResource!
     
-    var previewImage: String?
+    var asset: FacePaintingAsset?
+    var assetType: FacePaintingAssetType?
     
     // Tambahan: kontrol visibilitas desain
     var isDesignVisible: Bool = true {
@@ -42,8 +49,9 @@ class ARViewController: ARView {
     override var canBecomeFirstResponder: Bool { true }
     
     // Setup with optional ViewModel
-    func setup(previewImage: String? = nil) {
-        self.previewImage = previewImage
+    func setup(asset: FacePaintingAsset, assetType: FacePaintingAssetType) {
+        self.asset = asset
+        self.assetType = assetType
         
         do {
             sparklyNormalMap = try TextureResource.load(named: "sparkly")
@@ -67,11 +75,22 @@ class ARViewController: ARView {
     }
     
     private func updateFaceTextureFromAsset() {
+        guard let asset = asset else { return }
         guard let faceEntity = self.faceEntity else { return }
         
         if isDesignVisible {
-            let assetName = previewImage ?? "halalmy"
-            
+            let assetName: String
+            switch assetType {
+            case .preview:
+                assetName = asset.previewImage
+            case .dot:
+                assetName = asset.dotPreviewImage
+            case .outline:
+                assetName = asset.outlinePreviewImage
+            default:
+                assetName = "halalmy"
+            }
+
             if let uiImage = UIImage(named: assetName),
                let cgImage = uiImage.cgImage,
                let flippedImage = flippedVertically(cgImage) {

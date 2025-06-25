@@ -13,18 +13,21 @@ struct PreviewView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showTutorial = true
     @State private var showPreviewImage = true
-    let previewImage: String
+    @EnvironmentObject private var router: Router
     
+    let asset: FacePaintingAsset
     var body: some View {
         ZStack {
             // AR View with toggle-able preview overlay
-            PreviewARViewContainer(previewImage: previewImage, showPreviewImage: showPreviewImage)
+            PreviewARViewContainer(asset: asset, showPreviewImage: showPreviewImage)
                 .edgesIgnoringSafeArea(.all)
             VStack {
                 Spacer()
                 
                 VStack(spacing: 12) {
-                    NavigationLink(destination: DotView(previewImage: previewImage)) {
+                    Button {
+                        router.navigate(to: .calibrationview(asset: asset))
+                    } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
@@ -41,7 +44,6 @@ struct PreviewView: View {
                 .padding(.bottom, 30)
             }
         }
-        //        .navigationTitle("Design Preview")
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("Design Preview")
@@ -120,12 +122,12 @@ struct TutorialSheetView: View {
 }
 
 struct PreviewARViewContainer: UIViewRepresentable {
-    let previewImage: String
+    let asset: FacePaintingAsset
     let showPreviewImage: Bool
-    
+
     func makeUIView(context: Context) -> ARView {
         let arView = ARViewController(frame: .zero)
-        arView.setup(previewImage: previewImage)
+        arView.setup(asset: asset, assetType: .preview)
         arView.setDesignVisible(showPreviewImage)
         return arView
     }
