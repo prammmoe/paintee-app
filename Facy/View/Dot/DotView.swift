@@ -12,6 +12,8 @@ import RealityKit
 struct DotView: View {
     @StateObject private var viewModel = DotViewModel()
     let previewImage: String
+    @State private var navigateToStepOne = false
+
 
     var body: some View {
         ZStack {
@@ -55,36 +57,58 @@ struct DotView: View {
                     }
                     .padding(.horizontal, 20)
                     
-                    // Capture Button
-                    Button(action: {
-                        viewModel.captureARPhoto()
-                    }) {
-                        Text("Continue to drawing step")
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 50)
-                            .background(viewModel.canCapture ? Color.green : Color.blue)
-                            .cornerRadius(10)
+//                    // Capture Button
+//                    Button(action: {
+//                        viewModel.captureARPhoto()
+//                    }) {
+//                        Text("Continue")
+//                            .font(.system(size: 17, weight: .semibold))
+//                            .foregroundColor(.white)
+//                            .frame(maxWidth: .infinity)
+//                            .frame(height: 50)
+//                            .background(viewModel.canCapture ? Color("dark-blue") : Color("light-blue"))
+//                            .cornerRadius(10)
+//                    }
+//                    .disabled(!viewModel.canCapture)
+//                    .padding(.horizontal, 20)
+                    VStack(spacing: 12) {
+                        NavigationLink(destination: StepOne(previewImage: previewImage)) {
+                            Text("Continue")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(Color("dark-blue"))
+                                .cornerRadius(15)
+                        }
                     }
-                    .disabled(!viewModel.canCapture)
                     .padding(.horizontal, 20)
+                    .padding(.bottom, 30)
                 }
-                .padding(.bottom, 50)
+//                .padding(.bottom, 50)
             }
         }
-        .navigationTitle("Position Your Face")
+//        .navigationTitle("Position Your Face")
+//        .navigationBarTitleDisplayMode(.inline)
+//        .alert("Photo Captured", isPresented: $viewModel.showSuccessAlert) {
+//            Button("OK") { }
+//        } message: {
+//            Text("Face with stars captured successfully!")
+//        }
+//        .alert("Error", isPresented: $viewModel.showErrorAlert) {
+//            Button("OK") { }
+//        } message: {
+//            Text(viewModel.errorMessage)
+//        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Position Your Face")
+                    .font(.headline)
+                    .foregroundColor(.blue)
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Photo Captured", isPresented: $viewModel.showSuccessAlert) {
-            Button("OK") { }
-        } message: {
-            Text("Face with stars captured successfully!")
-        }
-        .alert("Error", isPresented: $viewModel.showErrorAlert) {
-            Button("OK") { }
-        } message: {
-            Text(viewModel.errorMessage)
-        }
+        .navigationBarBackButtonHidden(false)
     }
 }
 

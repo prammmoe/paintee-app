@@ -34,7 +34,7 @@ struct OnboardingDrawingStepsView: View {
 
     var body: some View {
         ZStack {
-            Color("blue").ignoresSafeArea()
+            Color("dark-blue").ignoresSafeArea()
             VStack {
                 HStack {
                     Button("Back") { /* logic here */ }
@@ -65,7 +65,7 @@ struct OnboardingDrawingStepsView: View {
                                 .fontWeight(.bold)
                                 .multilineTextAlignment(.center)
                                 .font(.title)
-                                .foregroundColor(Color("yellow"))
+                                .foregroundColor(Color("dark-yellow"))
                                 .padding(.top, 20)
                                 .padding(.horizontal)
 
@@ -99,7 +99,7 @@ struct OnboardingDrawingStepsView: View {
                                             .foregroundColor(.white)
                                             .frame(maxWidth: .infinity)
                                             .padding()
-                                            .background(Color("yellow"))
+                                            .background(Color("dark-yellow"))
                                             .cornerRadius(15)
                                             .padding(.horizontal)
                                             .padding(.top)
@@ -109,7 +109,7 @@ struct OnboardingDrawingStepsView: View {
                                     HStack(spacing: 10) {
                                         ForEach(0..<drawingSteps.count, id: \.self) { index in
                                             Circle()
-                                                .fill(index == currentStep ? Color("yellow") : Color.gray.opacity(0.7))
+                                                .fill(index == currentStep ? Color("dark-yellow") : Color.gray.opacity(0.7))
                                                 .frame(width: 10, height: 10)
                                         }
                                     }

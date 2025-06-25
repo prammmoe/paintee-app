@@ -29,9 +29,22 @@
 		5024145D2DFFBE3F001EE739 /* FacyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FacyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		45D5211F2E0BC32300B37270 /* Exceptions for "Facy" folder in "Facy" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 502414422DFFBE3E001EE739 /* Facy */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		502414452DFFBE3E001EE739 /* Facy */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				45D5211F2E0BC32300B37270 /* Exceptions for "Facy" folder in "Facy" target */,
+			);
 			path = Facy;
 			sourceTree = "<group>";
 		};
@@ -399,7 +412,9 @@
 				DEVELOPMENT_TEAM = QW8PFJL6C3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Facy/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "This allows app use your camera to apply face painting effects in real time.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your photo library to save your captured image.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -429,7 +444,9 @@
 				DEVELOPMENT_TEAM = QW8PFJL6C3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Facy/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "This allows app use your camera to apply face painting effects in real time.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your photo library to save your captured image.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
