@@ -33,25 +33,25 @@ struct OnboardingView: View {
             
             VStack(alignment: .leading, spacing: 20) {
                             // Top Image
-                            Image("Woman FP") // Replace with your asset name
+                            Image("woman") // Replace with your asset name
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 300, height: 300)
+                                .frame(width: 360, height: 360)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding(.top, 40)
                             Spacer()
 
                             // Title
-                            Text("Dot by Dot")
+                            Text("Paintee")
                                 .font(.system(size: 40))
                                 .fontWeight(.bold)
-                                .foregroundColor(Color.orange)
+                                .foregroundColor(.pYellow)
                                 .padding(.horizontal, 40)
 
                             // Subtitle
                             Text("Learn to paint your face symmetrically with real-time camera guides. Place dots, connect them, and follow visual steps to build your skill")
                                 .font(.body)
-                                .foregroundColor(.white)
+                                .foregroundColor(.pCream)
                                 .multilineTextAlignment(.leading)
                                 .padding(.horizontal, 40)
 
@@ -66,11 +66,11 @@ struct OnboardingView: View {
                 }) {
                     Text("Let’s Get Started")
                         .fontWeight(.semibold)
-                        .foregroundColor(.white)
+                        .foregroundColor(.pBlue)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.orange)
-                        .cornerRadius(15)
+                        .background(Color.pYellow)
+                        .cornerRadius(16)
                         .padding(.horizontal, 40)
                 }
                 

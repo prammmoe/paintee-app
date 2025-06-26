@@ -10,7 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @EnvironmentObject private var router: Router
-        
+    
     var body: some View {
         NavigationStack(path: $router.path) {
             ZStack {
@@ -20,20 +20,26 @@ struct HomeView: View {
                 .ignoresSafeArea()
                 
                 VStack(alignment: .leading, spacing: 5) {
+                    Spacer().frame(height: 33)
+                    Text("Face Painting")
+                        .font(.system(size: 36, weight: .heavy))
+                        .foregroundColor(Color.pYellow)
+                        .padding(.horizontal, 15)
+                    
                     Text("Design Collection")
                         .font(.system(size: 36, weight: .heavy))
-                        .foregroundColor(Color.lightBlue)
+                        .foregroundColor(Color.pTurq)
                         .padding(.horizontal, 15)
                     
                     Text("Choose our creative and easy-to-draw face painting design collection.")
                         .font(.system(size: 18, weight: .light))
                         .fontWeight(.regular)
-                        .foregroundColor(.white)
+                        .foregroundColor(.pCream)
                         .padding([.top, .horizontal])
                         .multilineTextAlignment(.leading)
                         .padding(.leading, 1)
                     
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 14) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 45) {
                         ForEach(viewModel.assets, id: \.id) { asset in
                             Button {
                                 router.navigate(to: .previewview(asset: asset))
@@ -42,7 +48,7 @@ struct HomeView: View {
                             }
                         }
                     }
-                    .padding(.top, 25)
+                    .padding(.top, 45)
                     
                     Spacer()
                 }
@@ -50,20 +56,20 @@ struct HomeView: View {
             }
             .navigationDestination(for: Route.self) { route in
                 switch route {
-                    case .previewview(let asset):
-                        PreviewView(asset: asset)
-                    case .drawingsteptutorialview(let asset):
-                        DrawingStepTutorialView(asset: asset)
-                    case .calibrationview(let asset):
-                        CalibrationView(asset: asset)
-                    case .dotview(let asset):
-                        DotView(asset: asset)
-                    case .connectdotview(let asset):
-                        ConnectDotView(asset: asset)
-                    case .drawingview(let asset):
-                        DrawingView(asset: asset)
-                    case .camerasnapview:
-                        CameraSnapView()
+                case .previewview(let asset):
+                    PreviewView(asset: asset)
+                case .drawingsteptutorialview(let asset):
+                    DrawingStepTutorialView(asset: asset)
+                case .calibrationview(let asset):
+                    CalibrationView(asset: asset)
+                case .dotview(let asset):
+                    DotView(asset: asset)
+                case .connectdotview(let asset):
+                    ConnectDotView(asset: asset)
+                case .drawingview(let asset):
+                    DrawingView(asset: asset)
+                case .camerasnapview:
+                    CameraSnapView()
                 }
             }
         }
@@ -75,32 +81,54 @@ struct DesignCard: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            Color.lightYellow
+            Color.pCream
                 .shadow(radius: 5)
                 .cornerRadius(25)
+            
             Image(asset.homeImage)
-
                 .resizable()
                 .scaledToFit()
                 .frame(width: 126, height: 161)
                 .padding(.bottom,15)
             
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.orange)
-                .frame(width: 140, height: 30)
+            Color.pYellow
+                .frame(width: 152, height: 30)
+                .cornerRadius(12, corners: [.bottomLeft, .bottomRight])
                 .overlay(
                     Text(asset.name)
                         .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(.pBlue)
                 )
-                .padding(.trailing)
         }
         .frame(width: 152, height: 184)
         .padding(5)
     }
 }
+import SwiftUI
+import UIKit
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat
+    var corners: UIRectCorner
+    
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
+    }
+}
+
+extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape(RoundedCorner(radius: radius, corners: corners))
+    }
+}
 
 #Preview {
     HomeView()
+        .environmentObject(Router())
 }
 
