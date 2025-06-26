@@ -165,5 +165,3 @@ class PreviewARView: ARView {
         setDesignVisible(show)
     }
 }
-
-

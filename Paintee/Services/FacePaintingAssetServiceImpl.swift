@@ -9,7 +9,7 @@ import SwiftUI
 
 // Repository Implementation
 class FacePaintingAssetServiceImpl: FacePaintingAssetServiceProtocol {
-    let dummyData = FacePaintingAsset.dummyData()
+    let dummyData = FacePaintingAsset.assetData()
 
     func getAllFacePaintingAsset() -> [FacePaintingAsset] {
         return dummyData

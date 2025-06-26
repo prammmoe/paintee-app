@@ -1,8 +1,8 @@
 //
-//  StepOne.swift
+//  FaceDetectionView.swift
 //  Facy
 //
-//  Created by Shafa Tiara Tsabita Himawan on 25/06/25.
+//  Created by Pramuditha Muhammad Ikhwan on 14/06/25.
 //
 
 import SwiftUI
@@ -10,20 +10,20 @@ import ARKit
 import RealityKit
 
 struct DotView: View {
-    @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var router: Router
-    @State private var showTutorial = true
-    @State private var showPreviewImage = true
-    
+    @StateObject private var viewModel = DotViewModel()
     let asset: FacePaintingAsset
+    
+    @EnvironmentObject private var router: Router
+    @State private var navigateToStepOne = false
+    @State private var showPreviewImage = true
     
     var body: some View {
         ZStack {
-            DotARViewContainer(asset: asset, showPreviewImage: showPreviewImage)
-                .edgesIgnoringSafeArea(.all)
-            
+            CalibrationARViewContainer(viewModel: viewModel, asset: asset, showPreviewImage: showPreviewImage)
+                .ignoresSafeArea(.all)
+    
             VStack {
-                Text("Follow the dots and mark your face!")
+                Text(viewModel.warningMessage)
                     .font(.subheadline)
                     .foregroundColor(.black)
                     .multilineTextAlignment(.center)
@@ -82,14 +82,16 @@ struct DotView: View {
     }
 }
 
-struct DotARViewContainer: UIViewRepresentable {
+struct CalibrationARViewContainer: UIViewRepresentable {
+    @ObservedObject var viewModel: DotViewModel
     let asset: FacePaintingAsset
     let showPreviewImage: Bool
     
     func makeUIView(context: Context) -> ARView {
         let arView = DotARView(frame: .zero)
-        arView.setup(asset: asset, assetType: .preview)
-        arView.setDesignVisible(showPreviewImage)
+        arView.setup(asset: asset, assetType: .dot)
+        arView.session.delegate = context.coordinator
+        
         return arView
     }
     
@@ -98,16 +100,34 @@ struct DotARViewContainer: UIViewRepresentable {
             arVC.setDesignVisible(showPreviewImage)
         }
     }
+    func makeCoordinator() -> Coordinator {
+        Coordinator(viewModel: viewModel)
+    }
     
-    static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
-        if let customView = uiView as? DotARView {
-            customView.stopSession()
+    static func dismantleUIView(_ uiView: ARView, coordinator: Coordinator) {
+        if let customARView = uiView as? DotARView {
+            customARView.stopSession()
         } else {
             uiView.session.pause()
         }
     }
+    
+    class Coordinator: NSObject, ARSessionDelegate {
+        let viewModel: DotViewModel
+        
+        init(viewModel: DotViewModel) {
+            self.viewModel = viewModel
+        }
+        
+        private var lastProcessTime = Date()
+        
+        func session(_ session: ARSession, didUpdate frame: ARFrame) {
+            let now = Date()
+            if now.timeIntervalSince(lastProcessTime) > 0.3 {
+                lastProcessTime = now
+                viewModel.analyzeFrame(frame)
+            }
+        }
+    }
 }
-
-
-
 

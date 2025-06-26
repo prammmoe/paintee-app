@@ -10,9 +10,9 @@ import Vision
 import ARKit
 import CoreMotion
 
-class CalibrationViewModel: ObservableObject {
+class DotViewModel: ObservableObject {
     @Published var warningMessage = "Position your face for setup before you start outlining"
-    @Published var canCapture = false
+    @Published var canStartDotting = false
     @Published var showSuccessAlert = false
     @Published var showErrorAlert = false
     @Published var errorMessage = ""
@@ -46,7 +46,7 @@ class CalibrationViewModel: ObservableObject {
     
     func updateCaptureStatus() {
         let allConditionMet = faceDetected && !faceMoving && !deviceMoving && lightingGood
-        canCapture = allConditionMet
+        canStartDotting = allConditionMet
         
         let newMessage: String
         if !faceDetected {
@@ -58,7 +58,7 @@ class CalibrationViewModel: ObservableObject {
         } else if !lightingGood {
             newMessage = "Improve lighting conditions."
         } else {
-            newMessage = "Perfect! Ready to draw!"
+            newMessage = "Perfect!\n Follow the dots and mark your face!"
         }
         
         if warningMessage != newMessage {

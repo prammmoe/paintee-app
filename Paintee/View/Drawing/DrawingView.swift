@@ -88,7 +88,7 @@ struct DrawingARViewContainer: UIViewRepresentable {
     
     func makeUIView(context: Context) -> ARView {
         let arView = DrawingARView(frame: .zero)
-        arView.setup(asset: asset, assetType: .preview)
+        arView.setup(asset: asset, assetType: .outline)
         arView.setDesignVisible(showPreviewImage)
         return arView
     }

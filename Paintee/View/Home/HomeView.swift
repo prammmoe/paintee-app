@@ -54,8 +54,6 @@ struct HomeView: View {
                         PreviewView(asset: asset)
                     case .drawingsteptutorialview(let asset):
                         DrawingStepTutorialView(asset: asset)
-                    case .calibrationview(let asset):
-                        CalibrationView(asset: asset)
                     case .dotview(let asset):
                         DotView(asset: asset)
                     case .connectdotview(let asset):
