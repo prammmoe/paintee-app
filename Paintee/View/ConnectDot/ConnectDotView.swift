@@ -87,7 +87,7 @@ struct ConnectDotARViewContainer: UIViewRepresentable {
     
     func makeUIView(context: Context) -> ARView {
         let arView = ConnetDotARView(frame: .zero)
-        arView.setup(asset: asset, assetType: .preview)
+        arView.setup(asset: asset, assetType: .outline)
         return arView
     }
     

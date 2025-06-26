@@ -68,7 +68,7 @@ struct DrawingStepTutorialView: View {
                 
                 if currentStep == drawingSteps.count - 1 {
                     Button(action: {
-                        router.navigate(to: .calibrationview(asset: asset))
+                        router.navigate(to: .dotview(asset: asset))
                     }) {
                         Text("Continue")
                             .font(.headline)
@@ -99,7 +99,7 @@ struct DrawingStepTutorialView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    router.navigate(to: .calibrationview(asset: asset))
+                    router.navigate(to: .dotview(asset: asset))
                 } label: {
                     Text("Lewati")
                 }

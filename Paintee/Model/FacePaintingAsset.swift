@@ -15,27 +15,32 @@ struct FacePaintingAsset: Hashable, Equatable, Identifiable {
     var outlinePreviewImage: String
     var homeImage: String
     
-    static func dummyData() -> [FacePaintingAsset] {
+    static func assetData() -> [FacePaintingAsset] {
         return [
+            // Animal
             FacePaintingAsset(
-                name: "Clown",
-                previewImage: "clown",
-                dotPreviewImage: "circle.fill",
-                outlinePreviewImage: "circle.dashed",
+                name: "Animal",
+                previewImage: "Animal",
+                dotPreviewImage: "AnimalDot",
+                outlinePreviewImage: "AnimalOutline",
                 homeImage: "design2"
             ),
+            
+            // Clown
             FacePaintingAsset(
-                name: "Tribal",
-                previewImage: "tribal",
-                dotPreviewImage: "circle.fill",
-                outlinePreviewImage: "circle.dashed",
+                name: "Clown",
+                previewImage: "Clown",
+                dotPreviewImage: "ClownDot",
+                outlinePreviewImage: "ClownOutline",
                 homeImage: "design1"
             ),
+            
+            // Mask
             FacePaintingAsset(
-                name: "Fox",
-                previewImage: "fox",
-                dotPreviewImage: "circle.fill",
-                outlinePreviewImage: "circle.dashed",
+                name: "Mask",
+                previewImage: "Mask",
+                dotPreviewImage: "MaskDot",
+                outlinePreviewImage: "MaskOutline",
                 homeImage: "design3"
             )
         ]

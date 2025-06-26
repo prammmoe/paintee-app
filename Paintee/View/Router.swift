@@ -10,7 +10,6 @@ import SwiftUI
 enum Route: Hashable {
     case previewview(asset: FacePaintingAsset)
     case drawingsteptutorialview(asset: FacePaintingAsset)
-    case calibrationview(asset: FacePaintingAsset)
     case dotview(asset: FacePaintingAsset)
     case connectdotview(asset: FacePaintingAsset)
     case drawingview(asset: FacePaintingAsset)
