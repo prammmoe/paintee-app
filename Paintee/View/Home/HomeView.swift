@@ -11,7 +11,17 @@ import UIKit
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @EnvironmentObject private var router: Router
-    
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    private var isWideScreen: Bool {
+        horizontalSizeClass == .regular || UIScreen.main.bounds.width > 600
+    }
+
+    private var gridColumns: [GridItem] {
+        let columnCount = isWideScreen ? 3 : 2
+        return Array(repeating: GridItem(.flexible(minimum: 150)), count: columnCount)
+    }
+
     var body: some View {
         NavigationStack(path: $router.path) {
             ZStack {
@@ -22,44 +32,44 @@ struct HomeView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing)
                 .ignoresSafeArea()
-                
+
                 VStack(alignment: .leading, spacing: 3) {
-                    Spacer().frame(height: 65)
-                    
+                    Spacer().frame(height: isWideScreen ? 85 : 65)
+
                     Text("Face Painting")
-                        .font(.system(size: 36, weight: .heavy))
+                        .font(.system(size: isWideScreen ? 44 : 36, weight: .heavy))
                         .foregroundColor(Color.pYellow)
-                        .padding(.horizontal, 15)
-                    
+                        .padding(.horizontal, isWideScreen ? 25 : 15)
+
                     Text("Design Collection")
-                        .font(.system(size: 36, weight: .heavy))
+                        .font(.system(size: isWideScreen ? 44 : 36, weight: .heavy))
                         .foregroundColor(Color.pTurq)
-                        .padding(.horizontal, 15)
-                    
+                        .padding(.horizontal, isWideScreen ? 25 : 15)
+
                     Text("Choose our creative and easy-to-draw face painting design collection.")
                         .font(.system(size: 18, weight: .light))
                         .fontWeight(.regular)
                         .foregroundColor(.pCream)
-                        .padding([.top, .horizontal])
+                        .padding([.top, .horizontal], isWideScreen ? 25 : 15)
                         .multilineTextAlignment(.leading)
                         .padding(.leading, 1)
-                    
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 150)), count: 2), spacing: 25) {
+
+                    LazyVGrid(columns: gridColumns, spacing: isWideScreen ? 35 : 25) {
                         ForEach(Array(viewModel.assets.enumerated()), id: \.element.id) { index, asset in
                             Button {
                                 router.navigate(to: .previewview(asset: asset))
                             } label: {
-                                DesignCard(asset: asset)
+                                DesignCard(asset: asset, isWideScreen: isWideScreen)
                             }
                             .accessibilityLabel("\(index + 1). \(asset.name)")
                             .accessibilityIdentifier("DesignCard_\(asset.id.uuidString)")
                         }
                     }
-                    .padding(.top, 45)
-                    
+                    .padding(.top, isWideScreen ? 60 : 45)
+
                     Spacer()
                 }
-                .padding(.horizontal, 15)
+                .padding(.horizontal, isWideScreen ? 25 : 15)
             }
             .navigationDestination(for: Route.self) { route in
                 switch route {
@@ -83,29 +93,30 @@ struct HomeView: View {
 
 struct DesignCard: View {
     let asset: FacePaintingAsset
-    
+    var isWideScreen: Bool = false
+
     var body: some View {
         ZStack(alignment: .bottom) {
             Color.pCream
                 .shadow(radius: 5)
                 .cornerRadius(25)
-            
+
             Image(asset.homeImage)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 130, height: 165)
+                .frame(width: isWideScreen ? 160 : 130, height: isWideScreen ? 200 : 165)
                 .padding(.bottom, 15)
-            
+
             Color.pYellow
-                .frame(width: 160, height: 30)
+                .frame(width: isWideScreen ? 180 : 160, height: 30)
                 .cornerRadius(25, corners: [.bottomLeft, .bottomRight])
                 .overlay(
                     Text(asset.name)
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: isWideScreen ? 22 : 20, weight: .bold))
                         .foregroundColor(.pBlue)
                 )
         }
-        .frame(width: 160, height: 184)
+        .frame(width: isWideScreen ? 180 : 160, height: isWideScreen ? 210 : 184)
         .padding(5)
     }
 }
@@ -113,7 +124,7 @@ struct DesignCard: View {
 struct RoundedCorner: Shape {
     var radius: CGFloat
     var corners: UIRectCorner
-    
+
     func path(in rect: CGRect) -> Path {
         let path = UIBezierPath(
             roundedRect: rect,

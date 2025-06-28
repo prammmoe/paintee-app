@@ -22,60 +22,51 @@ let drawingSteps: [DrawingStep] = [
 
 struct DrawingStepTutorialView: View {
     @EnvironmentObject private var router: Router
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     let asset: FacePaintingAsset
 
-    var body: some View {
-        VStack(spacing: 24) {
-            // Back Button
-            HStack {
-                Button(action: {
-                    router.goBack()
-                }) {
-                    HStack(spacing: 5) {
-                        Image(systemName: "chevron.left")
-                        Text("Back")
-                    }
-                    .foregroundColor(.white)
-                    .font(.system(size: 16, weight: .semibold))
-                }
-                Spacer()
-                    .accessibilityLabel("2. Back")
-                    .accessibilityIdentifier("DrawingStepsBackButton")
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
+    private var isWideScreen: Bool {
+        horizontalSizeClass == .regular || UIScreen.main.bounds.width > 600
+    }
 
+    private var gridColumns: [GridItem] {
+        let columnCount = isWideScreen ? 3 : 2
+        return Array(repeating: GridItem(.flexible(), spacing: 15), count: columnCount)
+    }
+
+    var body: some View {
+        VStack(spacing: isWideScreen ? 30 : 24) {
             // Title
             Text("Drawing Steps")
-                .font(.system(size: 36, weight: .heavy))
+                .font(.system(size: isWideScreen ? 44 : 36, weight: .heavy))
                 .foregroundColor(Color("PYellow"))
-                .padding(.top, 5)
+                .padding(.top, isWideScreen ? 10 : 5)
 
             // Grid
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 15), count: 2), spacing: 30) {
+            LazyVGrid(columns: gridColumns, spacing: isWideScreen ? 40 : 30) {
                 ForEach(drawingSteps) { step in
-                    VStack(spacing: 15) {
+                    VStack(spacing: 10) {
                         Image(step.imageName)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 150, height: 150)
-                         
+                            .frame(width: isWideScreen ? 180 : 150, height: isWideScreen ? 180 : 150)
 
                         Text(step.title)
-                            .font(.system(size: 16, weight: .regular))
+                            .font(.system(size: isWideScreen ? 18 : 16, weight: .regular))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
                             .minimumScaleFactor(0.8)
                     }
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, isWideScreen ? 12 : 8)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 18)
-            
+            .padding(.horizontal, isWideScreen ? 24 : 16)
+            .padding(.top, isWideScreen ? 25 : 18)
+
             Spacer()
 
+            // Continue Button
             Button(action: {
                 router.navigate(to: .dotview(asset: asset))
             }) {
@@ -87,11 +78,12 @@ struct DrawingStepTutorialView: View {
                     .background(Color("PYellow"))
                     .cornerRadius(15)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 30)
+            .padding(.horizontal, isWideScreen ? 30 : 20)
+            .padding(.bottom, isWideScreen ? 40 : 30)
             .accessibilityLabel("1. Continue")
             .accessibilityIdentifier("DrawingStepsContinueButton")
         }
         .background(Color("PBlue").ignoresSafeArea())
+        .navigationBarBackButtonHidden(false)  
     }
 }
