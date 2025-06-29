@@ -56,16 +56,10 @@ class PreviewARView: ARView {
         // Configure AR session
         let configuration = ARFaceTrackingConfiguration()
         configuration.isLightEstimationEnabled = true
-        session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+        session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .stopTrackedRaycasts, .resetSceneReconstruction])
         
         subscription = scene.subscribe(to: SceneEvents.Update.self, onUpdate)
-        
-        setupFaceAnchor()
-    }
-    
-    private func setupFaceAnchor() {
-        faceAnchor = AnchorEntity(.face)
-        scene.addAnchor(faceAnchor!)
+
     }
     
     private func updateFaceTextureFromAsset() {
@@ -145,6 +139,8 @@ class PreviewARView: ARView {
     
     func stopSession() {
         session.pause()
+        scene.anchors.removeAll()
+        removeFromSuperview()
         subscription?.cancel()
         faceAnchor?.removeFromParent()
         faceAnchor = nil
