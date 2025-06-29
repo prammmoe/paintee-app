@@ -29,8 +29,8 @@ struct PreviewCapture: View {
                     }) {
                         Text("Retake")
                             .frame(width: 140, height: 50)
-                            .background(Color("just-blue"))
-                            .foregroundColor(.white)
+                            .background(.pBlue)
+                            .foregroundColor(.pCream)
                             .font(.system(size: 16, weight: .semibold))
                             .cornerRadius(15)
                     }
@@ -40,8 +40,8 @@ struct PreviewCapture: View {
                     }) {
                         Text("Save Image")
                             .frame(width: 140, height: 50)
-                            .background(Color("dark-blue"))
-                            .foregroundColor(.white)
+                            .background(.pTurq)
+                            .foregroundColor(.pBlue)
                             .font(.system(size: 16, weight: .semibold))
                             .cornerRadius(15)
                     }

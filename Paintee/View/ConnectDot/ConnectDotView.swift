@@ -28,9 +28,9 @@ struct ConnectDotView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(Color.orange.opacity(0.5))
+                    .background(.pYellow.opacity(0.8))
                     .cornerRadius(12)
-                    .padding(.top, 100)
+                    .padding(.top, 125)
                 
                 Spacer()
             }
@@ -46,10 +46,10 @@ struct ConnectDotView: View {
                     } label: {
                         Text("Continue")
                             .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(.pCream)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .background(Color("dark-blue"))
+                            .background(.pBlue)
                             .cornerRadius(15)
                     }
                 }
@@ -58,26 +58,40 @@ struct ConnectDotView: View {
             }
         }
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(.white)
+                }
+            }
             ToolbarItem(placement: .principal) {
                 Text("Step 2 of 3")
-                    .font(.headline)
-                    .foregroundColor(.blue)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     showPreviewImage.toggle()
                 }) {
                     Image(systemName: "sparkles")
-                        .font(.headline)
-                        .foregroundColor(showPreviewImage ? Color.yellow : .white)
-                        .padding(10)
+                        .font(.subheadline)
+                        .foregroundColor(showPreviewImage ? .pYellow : .white)
+                        .padding(7)
                         .background(Color.black.opacity(0.5))
                         .clipShape(Circle())
                 }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(false)
+        .toolbarBackground(Color.pBlue.opacity(0.5), for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .navigationBarTitleDisplayMode(.automatic)
+        .navigationBarBackButtonHidden(true)
         .onDisappear {
             print("ConnectDotView disappeared, session will stop (via dismantleUIView)")
         }

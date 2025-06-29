@@ -12,7 +12,8 @@ struct HomeView: View {
     @EnvironmentObject private var router: Router
         
     var body: some View {
-        NavigationStack(path: $router.path) {
+        NavigationStack(path: $router.path)
+        {
             ZStack {
                 LinearGradient(gradient: Gradient(colors: [Color(red: 34/255, green: 40/255, blue: 80/255), Color(red: 10/255, green: 20/255, blue: 50/255)]),
                                startPoint: .topLeading,
@@ -65,6 +66,7 @@ struct HomeView: View {
                 }
             }
         }
+        .tint(.white)
     }
 }
 
@@ -100,5 +102,6 @@ struct DesignCard: View {
 
 #Preview {
     HomeView()
+        .environmentObject(Router())
 }
 

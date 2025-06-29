@@ -10,6 +10,7 @@ import ARKit
 import RealityKit
 
 struct DotView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = DotViewModel()
     let asset: FacePaintingAsset
     
@@ -29,9 +30,9 @@ struct DotView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(Color.orange.opacity(0.5))
+                    .background(.pYellow.opacity(0.8))
                     .cornerRadius(12)
-                    .padding(.top, 100)
+                    .padding(.top, 125)
                 
                 Spacer()
             }
@@ -47,41 +48,56 @@ struct DotView: View {
                     } label: {
                         Text("Continue")
                             .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(.pCream)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .background(Color("dark-blue"))
+                            .background(viewModel.canStartDotting ? Color.pBlue : .pBlue.opacity(0.5))
                             .cornerRadius(15)
                     }
+                    .disabled(!viewModel.canStartDotting)
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.canStartDotting)
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 30)
             }
         }
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(.white)
+                }
+            }
             ToolbarItem(placement: .principal) {
                 Text("Step 1 of 3")
-                    .font(.headline)
-                    .foregroundColor(.blue)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     showPreviewImage.toggle()
                 }) {
                     Image(systemName: "sparkles")
-                        .font(.headline)
-                        .foregroundColor(showPreviewImage ? Color.yellow : .white)
-                        .padding(10)
+                        .font(.subheadline)
+                        .foregroundColor(showPreviewImage ? .pYellow : .white)
+                        .padding(7)
                         .background(Color.black.opacity(0.5))
                         .clipShape(Circle())
                 }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(false)
+        .toolbarBackground(Color.pBlue.opacity(0.5), for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .navigationBarTitleDisplayMode(.automatic)
+        .navigationBarBackButtonHidden(true)
         .onDisappear {
             print("DotView disappeared, session will stop (via dismantleUIView)")
-        }
     }
 }
 

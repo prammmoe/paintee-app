@@ -31,10 +31,10 @@ struct PreviewView: View {
                     } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(.pCream)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .background(Color("dark-blue"))
+                            .background(.pBlue)
                             .cornerRadius(15)
                     }
                     .disabled(showTutorial)
@@ -45,29 +45,45 @@ struct PreviewView: View {
                 .padding(.bottom, 30)
             }
         }
+        
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(.white)
+                }
+            }
             ToolbarItem(placement: .principal) {
                 Text("Design Preview")
-                    .font(.headline)
-                    .foregroundColor(.blue)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     showPreviewImage.toggle()
                 }) {
                     Image(systemName: "sparkles")
-                        .font(.headline)
-                        .foregroundColor(showPreviewImage ? Color.yellow : .white)
-                        .padding(10)
+                        .font(.subheadline)
+                        .foregroundColor(showPreviewImage ? .pYellow : .white)
+                        .padding(7)
                         .background(Color.black.opacity(0.5))
                         .clipShape(Circle())
                 }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(false)
+        .toolbarBackground(Color.pBlue.opacity(0.5), for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .navigationBarTitleDisplayMode(.automatic)
+        .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showTutorial) {
             TutorialSheetView()
+            
         }
     }
 }
@@ -79,27 +95,27 @@ struct TutorialSheetView: View {
         VStack(spacing: 24) {
             // Handle indicator
             RoundedRectangle(cornerRadius: 2)
-                .fill(Color.secondary)
+                .fill(Color.pBlue)
                 .frame(width: 40, height: 4)
                 .padding(.top, 8)
             
             Spacer()
             
             VStack(spacing: 16) {
-                Text("Preview your selected face painting guide")
-                    .font(.title2)
-                    .fontWeight(.medium)
+                Text("Preview your design")
+                    .font(.title)
+                    .fontWeight(.bold)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.pBlue)
                 
-                Text("You can continue or try different design.\nThe colors shown are just inspiration, feel free to get creative!")
+                Text("You can use this design or pick another.\nThe colors shown are just examples,\nfeel free to get creative!")
                     .font(.body)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.pBlue)
             }
             .padding(.horizontal, 40)
             
-            Spacer()
+          
             
             Button(action: {
                 dismiss()
@@ -109,15 +125,15 @@ struct TutorialSheetView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .background(Color.blue)
+                    .background(.pBlue)
                     .cornerRadius(15)
                 
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 40)
             .padding(.bottom, 34)
         }
-        .background(Color(.systemBackground))
-        .presentationDetents([.fraction(0.50)])
+        .background(Color(.pCream))
+        .presentationDetents([.fraction(0.40)])
         .presentationDragIndicator(.hidden)
         .onDisappear {
             print("PreviewView disappeared, session will stop (via dismantleUIView)")

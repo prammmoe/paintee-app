@@ -17,3 +17,4 @@ struct PainteeApp: App {
         .environmentObject(router)
     }
 }
+
