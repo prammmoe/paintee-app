@@ -14,7 +14,7 @@ struct ConnectDotView: View {
     @State private var showPreviewImage = true
     let asset: FacePaintingAsset
     @EnvironmentObject private var router: Router
-        
+    
     var body: some View {
         ZStack {
             // AR View with toggle-able preview overlay
@@ -92,6 +92,9 @@ struct ConnectDotView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
+        .onDisappear {
+            print("ConnectDotView disappeared, session will stop (via dismantleUIView)")
+        }
     }
 }
 

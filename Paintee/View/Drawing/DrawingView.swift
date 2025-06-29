@@ -93,6 +93,8 @@ struct DrawingView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
+        .onDisappear {
+            print("DrawingView disappeared, session will stop (via dismantleUIView)")
     }
 }
 

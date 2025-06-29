@@ -22,7 +22,7 @@ struct DotView: View {
         ZStack {
             CalibrationARViewContainer(viewModel: viewModel, asset: asset, showPreviewImage: showPreviewImage)
                 .ignoresSafeArea(.all)
-    
+            
             VStack {
                 Text(viewModel.warningMessage)
                     .font(.subheadline)
@@ -96,6 +96,8 @@ struct DotView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
+        .onDisappear {
+            print("DotView disappeared, session will stop (via dismantleUIView)")
     }
 }
 

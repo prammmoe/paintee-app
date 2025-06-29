@@ -78,8 +78,8 @@ struct DesignCard: View {
             Color.lightYellow
                 .shadow(radius: 5)
                 .cornerRadius(25)
+            
             Image(asset.homeImage)
-
                 .resizable()
                 .scaledToFit()
                 .frame(width: 126, height: 161)

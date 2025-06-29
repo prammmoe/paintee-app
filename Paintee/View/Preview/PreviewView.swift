@@ -135,13 +135,16 @@ struct TutorialSheetView: View {
         .background(Color(.pCream))
         .presentationDetents([.fraction(0.40)])
         .presentationDragIndicator(.hidden)
+        .onDisappear {
+            print("PreviewView disappeared, session will stop (via dismantleUIView)")
+        }
     }
 }
 
 struct PreviewARViewContainer: UIViewRepresentable {
     let asset: FacePaintingAsset
     let showPreviewImage: Bool
-
+    
     func makeUIView(context: Context) -> ARView {
         let arView = PreviewARView(frame: .zero)
         arView.setup(asset: asset, assetType: .preview)
