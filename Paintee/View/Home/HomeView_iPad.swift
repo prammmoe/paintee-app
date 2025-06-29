@@ -1,30 +1,31 @@
 //
-//  HomeDesignColletion.swift
-//  Facy
+//  HomeView_iPad.swift
+//  Paintee
 //
-//  Created by Pramuditha Muhammad Ikhwan on 16/06/25.
+//  Created by Abdul Jabbar on 28/06/25.
 //
-
 import SwiftUI
 import UIKit
 
-struct HomeView: View {
+struct HomeView_iPad: View {
     @StateObject private var viewModel = HomeViewModel()
     @EnvironmentObject private var router: Router
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
-    private var isWideScreen: Bool {
-        horizontalSizeClass == .regular || UIScreen.main.bounds.width > 600
-    }
 
     private var gridColumns: [GridItem] {
-        let columnCount = isWideScreen ? 3 : 2
+        let screenWidth = UIScreen.main.bounds.width
+        let columnCount: Int
+
+        if screenWidth >= 1200 {
+            columnCount = 4
+        } else {
+            columnCount = 2
+        }
+
         return Array(repeating: GridItem(.flexible(minimum: 150)), count: columnCount)
     }
 
     var body: some View {
-        NavigationStack(path: $router.path)
-        {
+        NavigationStack(path: $router.path) {
             ZStack {
                 LinearGradient(gradient: Gradient(colors: [
                     Color(red: 34/255, green: 40/255, blue: 80/255),
@@ -34,43 +35,41 @@ struct HomeView: View {
                 endPoint: .bottomTrailing)
                 .ignoresSafeArea()
 
-                VStack(alignment: .leading, spacing: 3) {
-                    Spacer().frame(height: isWideScreen ? 85 : 65)
+                VStack(alignment: .leading, spacing: 10) {
+                    Spacer().frame(height: 80)
 
                     Text("Face Painting")
-                        .font(.system(size: isWideScreen ? 44 : 36, weight: .heavy))
+                        .font(.system(size: 60, weight: .heavy))
                         .foregroundColor(Color.pYellow)
-                        .padding(.horizontal, isWideScreen ? 25 : 15)
+                        .padding(.horizontal, 100)
 
                     Text("Design Collection")
-                        .font(.system(size: isWideScreen ? 44 : 36, weight: .heavy))
+                        .font(.system(size: 60, weight: .heavy))
                         .foregroundColor(Color.pTurq)
-                        .padding(.horizontal, isWideScreen ? 25 : 15)
+                        .padding(.horizontal, 100)
 
                     Text("Choose our creative and easy-to-draw face painting design collection.")
-                        .font(.system(size: 18, weight: .light))
-                        .fontWeight(.regular)
+                        .font(.title3)
                         .foregroundColor(.pCream)
-                        .padding([.top, .horizontal], isWideScreen ? 25 : 15)
+                        .padding(.horizontal, 100)
                         .multilineTextAlignment(.leading)
-                        .padding(.leading, 1)
 
-                    LazyVGrid(columns: gridColumns, spacing: isWideScreen ? 35 : 25) {
+                    LazyVGrid(columns: gridColumns, spacing: 60) {
                         ForEach(Array(viewModel.assets.enumerated()), id: \.element.id) { index, asset in
                             Button {
                                 router.navigate(to: .previewview(asset: asset))
                             } label: {
-                                DesignCard(asset: asset, isWideScreen: isWideScreen)
+                                DesignCard_iPad(asset: asset)
                             }
                             .accessibilityLabel("\(index + 1). \(asset.name)")
                             .accessibilityIdentifier("DesignCard_\(asset.id.uuidString)")
                         }
                     }
-                    .padding(.top, isWideScreen ? 60 : 45)
+                    .padding(.top, 40)
+                    .padding(.horizontal,80)
 
                     Spacer()
                 }
-                .padding(.horizontal, isWideScreen ? 25 : 15)
             }
             .navigationDestination(for: Route.self) { route in
                 switch route {
@@ -89,60 +88,39 @@ struct HomeView: View {
                 }
             }
         }
-        .tint(.white)
     }
 }
 
-struct DesignCard: View {
+struct DesignCard_iPad: View {
     let asset: FacePaintingAsset
-    var isWideScreen: Bool = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
             Color.pCream
-                .shadow(radius: 5)
-                .cornerRadius(25)
+                .shadow(radius: 7)
+                .cornerRadius(30)
+
             Image(asset.homeImage)
                 .resizable()
                 .scaledToFit()
-                .frame(width: isWideScreen ? 160 : 130, height: isWideScreen ? 200 : 165)
-                .padding(.bottom, 15)
+                .frame(width: 272, height: 306)
+                .padding(.bottom, 50)
 
             Color.pYellow
-                .frame(width: isWideScreen ? 180 : 160, height: 30)
+                .frame(width: 350, height: 60)
                 .cornerRadius(25, corners: [.bottomLeft, .bottomRight])
                 .overlay(
                     Text(asset.name)
-                        .font(.system(size: isWideScreen ? 22 : 20, weight: .bold))
+                        .font(.system(size: 30, weight: .bold))
                         .foregroundColor(.pBlue)
                 )
         }
-        .frame(width: isWideScreen ? 180 : 160, height: isWideScreen ? 210 : 184)
-        .padding(5)
-    }
-}
-
-struct RoundedCorner: Shape {
-    var radius: CGFloat
-    var corners: UIRectCorner
-
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(
-            roundedRect: rect,
-            byRoundingCorners: corners,
-            cornerRadii: CGSize(width: radius, height: radius)
-        )
-        return Path(path.cgPath)
-    }
-}
-
-extension View {
-    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-        clipShape(RoundedCorner(radius: radius, corners: corners))
+        .frame(width: 350, height: 374)
+        .padding(8)
     }
 }
 
 #Preview {
-    HomeView()
+    HomeView_iPad()
         .environmentObject(Router())
 }
