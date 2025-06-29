@@ -131,6 +131,8 @@ struct TutorialSheetView: View {
             }
             .padding(.horizontal, 40)
             .padding(.bottom, 34)
+            .accessibilityLabel("1. Continue")
+            .accessibilityIdentifier("ConnectContinueButton")
         }
         .background(Color(.pCream))
         .presentationDetents([.fraction(0.40)])

@@ -12,6 +12,7 @@ struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @EnvironmentObject private var router: Router
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Binding var hasCompletedOnboarding: Bool
 
     private var isWideScreen: Bool {
         horizontalSizeClass == .regular || UIScreen.main.bounds.width > 600
@@ -74,6 +75,10 @@ struct HomeView: View {
             }
             .navigationDestination(for: Route.self) { route in
                 switch route {
+                    case .onboardingview:
+                    OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
+                    case .homeview:
+                    HomeView(hasCompletedOnboarding: $hasCompletedOnboarding)
                     case .previewview(let asset):
                         PreviewView(asset: asset)
                     case .drawingsteptutorialview(let asset):
@@ -142,7 +147,7 @@ extension View {
     }
 }
 
-#Preview {
-    HomeView()
-        .environmentObject(Router())
-}
+//#Preview {
+//    HomeView()
+//        .environmentObject(Router())
+//}

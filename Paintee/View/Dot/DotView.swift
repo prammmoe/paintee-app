@@ -54,6 +54,8 @@ struct DotView: View {
                             .background(viewModel.canStartDotting ? Color.pBlue : .pBlue.opacity(0.5))
                             .cornerRadius(15)
                     }
+                    .accessibilityLabel("1. Continue")
+                    .accessibilityIdentifier("ConnectContinueButton")
                     .disabled(!viewModel.canStartDotting)
                     .animation(.easeInOut(duration: 0.2), value: viewModel.canStartDotting)
                 }
@@ -97,56 +99,57 @@ struct DotView: View {
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
         .onDisappear {
+            viewModel.stopMonitoring()
             print("DotView disappeared, session will stop (via dismantleUIView)")
-    }
-}
-
-struct CalibrationARViewContainer: UIViewRepresentable {
-    @ObservedObject var viewModel: DotViewModel
-    let asset: FacePaintingAsset
-    let showPreviewImage: Bool
-    
-    func makeUIView(context: Context) -> ARView {
-        let arView = DotARView(frame: .zero)
-        arView.setup(asset: asset, assetType: .dot)
-        arView.session.delegate = context.coordinator
-        
-        return arView
-    }
-    
-    func updateUIView(_ uiView: ARView, context: Context) {
-        if let arVC = uiView as? DotARView {
-            arVC.setDesignVisible(showPreviewImage)
-        }
-    }
-    func makeCoordinator() -> Coordinator {
-        Coordinator(viewModel: viewModel)
-    }
-    
-    static func dismantleUIView(_ uiView: ARView, coordinator: Coordinator) {
-        if let customARView = uiView as? DotARView {
-            customARView.stopSession()
-        } else {
-            uiView.session.pause()
         }
     }
     
-    class Coordinator: NSObject, ARSessionDelegate {
-        let viewModel: DotViewModel
+    struct CalibrationARViewContainer: UIViewRepresentable {
+        @ObservedObject var viewModel: DotViewModel
+        let asset: FacePaintingAsset
+        let showPreviewImage: Bool
         
-        init(viewModel: DotViewModel) {
-            self.viewModel = viewModel
+        func makeUIView(context: Context) -> ARView {
+            let arView = DotARView(frame: .zero)
+            arView.setup(asset: asset, assetType: .dot)
+            arView.session.delegate = context.coordinator
+            
+            return arView
         }
         
-        private var lastProcessTime = Date()
+        func updateUIView(_ uiView: ARView, context: Context) {
+            if let arVC = uiView as? DotARView {
+                arVC.setDesignVisible(showPreviewImage)
+            }
+        }
+        func makeCoordinator() -> Coordinator {
+            Coordinator(viewModel: viewModel)
+        }
         
-        func session(_ session: ARSession, didUpdate frame: ARFrame) {
-            let now = Date()
-            if now.timeIntervalSince(lastProcessTime) > 0.3 {
-                lastProcessTime = now
-                viewModel.analyzeFrame(frame)
+        static func dismantleUIView(_ uiView: ARView, coordinator: Coordinator) {
+            if let customARView = uiView as? DotARView {
+                customARView.stopSession()
+            } else {
+                uiView.session.pause()
+            }
+        }
+        
+        class Coordinator: NSObject, ARSessionDelegate {
+            let viewModel: DotViewModel
+            
+            init(viewModel: DotViewModel) {
+                self.viewModel = viewModel
+            }
+            
+            private var lastProcessTime = Date()
+            
+            func session(_ session: ARSession, didUpdate frame: ARFrame) {
+                let now = Date()
+                if now.timeIntervalSince(lastProcessTime) > 0.3 {
+                    lastProcessTime = now
+                    viewModel.analyzeFrame(frame)
+                }
             }
         }
     }
 }
-

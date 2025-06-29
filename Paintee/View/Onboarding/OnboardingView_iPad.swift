@@ -81,11 +81,6 @@ struct OnboardingView_iPad: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 60)
-            
-            if showNextView {
-                NextView()
-                    .transition(.opacity)
-            }
         }
         .onAppear {
             animateStars = true

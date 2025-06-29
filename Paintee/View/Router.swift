@@ -8,6 +8,8 @@
 import SwiftUI
 
 enum Route: Hashable {
+    case onboardingview
+    case homeview
     case previewview(asset: FacePaintingAsset)
     case drawingsteptutorialview(asset: FacePaintingAsset)
     case dotview(asset: FacePaintingAsset)

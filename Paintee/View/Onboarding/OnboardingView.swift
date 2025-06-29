@@ -9,7 +9,8 @@ import SwiftUI
 
 struct OnboardingView: View {
     @State private var animateStars = false
-    @State private var showNextView = false
+//    @State private var showNextView = false
+    @Binding var hasCompletedOnboarding: Bool
     
     var body: some View {
         ZStack {
@@ -57,11 +58,10 @@ struct OnboardingView: View {
 
                             Spacer()
 
-                
                 // Button
                 Button(action: {
                     withAnimation {
-                        showNextView = true
+                        hasCompletedOnboarding = true
                     }
                 }) {
                     Text("Let’s Get Started")
@@ -78,12 +78,6 @@ struct OnboardingView: View {
                     .accessibilityIdentifier("OnboardingStartButton")
             }
             .padding(.top, 50)
-            
-            // Transition to next screen (placeholder view)
-            if showNextView {
-                NextView()
-                    .transition(.opacity)
-            }
         }
         .onAppear {
             animateStars = true
@@ -91,17 +85,6 @@ struct OnboardingView: View {
     }
 }
 
-// Dummy next view for transition demo
-struct NextView: View {
-    var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-            Text("Next Screen")
-                .font(.largeTitle)
-                .foregroundColor(.white)
-        }
-    }
-}
 #Preview {
-    OnboardingView()
+    OnboardingView(hasCompletedOnboarding: .constant(false))
 }
