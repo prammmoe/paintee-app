@@ -50,7 +50,7 @@ class DotViewModel: ObservableObject {
         
         let newMessage: String
         if !faceDetected {
-            newMessage = "No face detected. Make sure your face is in screen."
+            newMessage = "No face detected.\nMake sure your face is in the screen."
         } else if faceMoving {
             newMessage = "Keep your face still."
         } else if deviceMoving {

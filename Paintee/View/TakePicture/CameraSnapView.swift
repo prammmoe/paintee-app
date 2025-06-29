@@ -9,6 +9,7 @@ import SwiftUI
 import AVFoundation
 
 struct CameraSnapView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var cameraViewModel = CameraViewModel()
     @State private var showPreview = false
     @EnvironmentObject private var router: Router
@@ -42,24 +43,34 @@ struct CameraSnapView: View {
         }
         .ignoresSafeArea()
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(.white)
+                }
+            }
             ToolbarItem(placement: .principal) {
                 Text("Snap Your Results")
-                    .font(.headline)
+                    .font(.title3)
+                    .fontWeight(.bold)
                     .foregroundColor(.white)
-                    .shadow(color: .black, radius: 2)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("Home") {
                     router.reset()
                 }
                 .foregroundColor(.white)
-                .padding(8)
-                .background(Color.black.opacity(0.3))
-                .cornerRadius(8)
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(false)
+        .toolbarBackground(Color.pBlue.opacity(0.5), for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .navigationBarTitleDisplayMode(.automatic)
+        .navigationBarBackButtonHidden(true)
         .onAppear {
             print("CameraSnapView appeared - configuring camera")
             cameraViewModel.configureCamera()

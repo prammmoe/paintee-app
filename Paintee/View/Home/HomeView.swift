@@ -23,7 +23,8 @@ struct HomeView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $router.path) {
+        NavigationStack(path: $router.path)
+        {
             ZStack {
                 LinearGradient(gradient: Gradient(colors: [
                     Color(red: 34/255, green: 40/255, blue: 80/255),
@@ -88,6 +89,7 @@ struct HomeView: View {
                 }
             }
         }
+        .tint(.white)
     }
 }
 
@@ -100,7 +102,6 @@ struct DesignCard: View {
             Color.pCream
                 .shadow(radius: 5)
                 .cornerRadius(25)
-
             Image(asset.homeImage)
                 .resizable()
                 .scaledToFit()

@@ -28,9 +28,9 @@ struct DrawingView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(Color.orange.opacity(0.5))
+                    .background(.pYellow.opacity(0.8))
                     .cornerRadius(12)
-                    .padding(.top, 100)
+                    .padding(.top, 125)
                 
                 Spacer()
             }
@@ -47,10 +47,10 @@ struct DrawingView: View {
                     } label: {
                         Text("Finish")
                             .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(.pBlue)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .background(Color("dark-yellow"))
+                            .background(.pTurq)
                             .cornerRadius(15)
                     }
                 }
@@ -59,26 +59,42 @@ struct DrawingView: View {
             }
         }
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(.white)
+                }
+            }
             ToolbarItem(placement: .principal) {
                 Text("Step 3 of 3")
-                    .font(.headline)
-                    .foregroundColor(.blue)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     showPreviewImage.toggle()
                 }) {
                     Image(systemName: "sparkles")
-                        .font(.headline)
+                        .font(.subheadline)
                         .foregroundColor(showPreviewImage ? Color.yellow : .white)
-                        .padding(10)
+                        .padding(7)
                         .background(Color.black.opacity(0.5))
                         .clipShape(Circle())
                 }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(false)
+        .toolbarBackground(Color.pBlue.opacity(0.5), for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .navigationBarTitleDisplayMode(.automatic)
+        .navigationBarBackButtonHidden(true)
+        .onDisappear {
+            print("DrawingView disappeared, session will stop (via dismantleUIView)")
     }
 }
 
