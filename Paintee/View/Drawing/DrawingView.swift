@@ -79,6 +79,9 @@ struct DrawingView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
+        .onDisappear {
+            print("DrawingView disappeared, session will stop (via dismantleUIView)")
+        }
     }
 }
 
