@@ -109,6 +109,11 @@ class CameraViewModel: NSObject, ObservableObject {
             print("Camera session is not running")
             return
         }
+        // Haptic Feedback
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.prepare()
+        generator.impactOccurred()
+        
         let settings = AVCapturePhotoSettings()
         output.capturePhoto(with: settings, delegate: self)
     }
