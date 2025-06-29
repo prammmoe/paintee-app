@@ -10,9 +10,14 @@ import SwiftUI
 @main
 struct PainteeApp: App {
     @StateObject private var router = Router()
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            if hasCompletedOnboarding {
+                HomeView(hasCompletedOnboarding: $hasCompletedOnboarding)
+            } else {
+                OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
+            }
         }
         .environmentObject(router)
     }

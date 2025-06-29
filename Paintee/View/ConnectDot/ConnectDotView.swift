@@ -52,6 +52,8 @@ struct ConnectDotView: View {
                             .background(.pBlue)
                             .cornerRadius(15)
                     }
+                    .accessibilityLabel("1. Continue")
+                    .accessibilityIdentifier("ConnectContinueButton")
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 30)

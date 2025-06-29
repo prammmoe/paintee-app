@@ -51,6 +51,8 @@ struct CameraSnapView: View {
                         Image(systemName: "chevron.left")
                         Text("Back")
                     }
+                    .accessibilityLabel("3. Back")
+                    .accessibilityIdentifier("CameraBackButton")
                     .foregroundColor(.white)
                 }
             }

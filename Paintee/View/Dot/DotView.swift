@@ -54,6 +54,8 @@ struct DotView: View {
                             .background(viewModel.canStartDotting ? Color.pBlue : .pBlue.opacity(0.5))
                             .cornerRadius(15)
                     }
+                    .accessibilityLabel("1. Continue")
+                    .accessibilityIdentifier("ConnectContinueButton")
                     .disabled(!viewModel.canStartDotting)
                     .animation(.easeInOut(duration: 0.2), value: viewModel.canStartDotting)
                 }
