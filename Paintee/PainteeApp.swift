@@ -14,7 +14,7 @@ struct PainteeApp: App {
     var body: some Scene {
         WindowGroup {
             if hasCompletedOnboarding {
-                HomeView(hasCompletedOnboarding: $hasCompletedOnboarding)
+                ContentView(hasCompletedOnboarding: $hasCompletedOnboarding)
             } else {
                 OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
             }

@@ -44,7 +44,7 @@ struct DotView: View {
                 
                 VStack(spacing: 12) {
                     Button {
-                        router.navigate(to: .connectdotview(asset: asset))
+                        router.currentARRoute = .connectdotview(asset: asset)
                     } label: {
                         Text("Continue")
                             .font(.system(size: 17, weight: .semibold))

@@ -42,7 +42,7 @@ struct DrawingView: View {
                 
                 VStack(spacing: 12) {
                     Button {
-                        router.navigate(to: .camerasnapview)
+                        router.exitARAndContinue(to: .camerasnapview)
                         print("Otw navigation to CameraSnapView")
                     } label: {
                         Text("Finish")

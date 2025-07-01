@@ -27,7 +27,7 @@ struct PreviewView: View {
                 
                 VStack(spacing: 12) {
                     Button {
-                        router.navigate(to: .drawingsteptutorialview(asset: asset))
+                        router.exitARAndContinue(to: .drawingsteptutorialview(asset: asset))
                     } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .semibold))
