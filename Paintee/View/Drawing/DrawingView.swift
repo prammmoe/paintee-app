@@ -46,7 +46,7 @@ struct DrawingView: View {
                         print("Otw navigation to CameraSnapView")
                     } label: {
                         Text("Finish")
-                            .font(.system(size: 17, weight: .semibold))
+                            .font(.system(size: 17, weight: .bold))
                             .foregroundColor(.pBlue)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
