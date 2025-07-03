@@ -33,11 +33,13 @@ class DotARView: ARView {
     required init(frame: CGRect) {
         super.init(frame: frame)
         isMultipleTouchEnabled = true
+        print("DotARView started")
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         isMultipleTouchEnabled = true
+        print("DotARView started")
     }
     
     override var canBecomeFirstResponder: Bool { true }
@@ -149,6 +151,7 @@ class DotARView: ARView {
     deinit {
         subscription?.cancel()
         session.pause()
+        print("DotARView stopped")
     }
   
     // Tambahan: fungsi untuk mengatur visibilitas desain

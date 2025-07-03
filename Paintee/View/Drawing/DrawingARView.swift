@@ -33,11 +33,13 @@ class DrawingARView: ARView {
     required init(frame: CGRect) {
         super.init(frame: frame)
         isMultipleTouchEnabled = true
+        print("DrawingARView started")
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         isMultipleTouchEnabled = true
+        print("DrawingARView started")
     }
     
     override var canBecomeFirstResponder: Bool { true }
@@ -149,6 +151,7 @@ class DrawingARView: ARView {
     deinit {
         subscription?.cancel()
         session.pause()
+        print("DrawingARView stopped")
     }
   
     // Tambahan: fungsi untuk mengatur visibilitas desain

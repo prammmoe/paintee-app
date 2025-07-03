@@ -1,8 +1,8 @@
 //
-//  ARFaceView.swift
-//  Facy
+//  FacePaintingARView.swift
+//  Paintee
 //
-//  Created by Pramuditha Muhammad Ikhwan on 22/06/25.
+//  Created by Pramuditha Muhammad Ikhwan on 03/07/25.
 //
 
 import SwiftUI
@@ -10,7 +10,7 @@ import ARKit
 import RealityKit
 import Combine
 
-class PreviewARView: ARView {
+class FacePaintingARView: ARView {
     
     var subscription: Cancellable?
     var faceEntity: HasModel? = nil
@@ -42,13 +42,16 @@ class PreviewARView: ARView {
         print("PreviewARView started")
     }
     
+    deinit {
+        subscription?.cancel()
+        session.pause()
+        print("PreviewARView stopped")
+    }
+    
     override var canBecomeFirstResponder: Bool { true }
     
-    // Setup with optional ViewModel
-    func setup(asset: FacePaintingAsset, assetType: FacePaintingAssetType) {
-        self.asset = asset
-        self.assetType = assetType
-        
+    // AR Session setup
+    func setupSession() {
         do {
             sparklyNormalMap = try TextureResource.load(named: "sparkly")
         } catch {
@@ -58,13 +61,18 @@ class PreviewARView: ARView {
         // Configure AR session
         let configuration = ARFaceTrackingConfiguration()
         configuration.isLightEstimationEnabled = true
-        session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .stopTrackedRaycasts, .resetSceneReconstruction])
+        session.run(configuration, options: [
+            .resetTracking,
+            .removeExistingAnchors,
+            .stopTrackedRaycasts,
+            .resetSceneReconstruction
+        ])
         
         subscription = scene.subscribe(to: SceneEvents.Update.self, onUpdate)
 
     }
     
-    private func updateFaceTextureFromAsset() {
+    func updateFaceTextureFromAsset() {
         guard let asset = asset else { return }
         guard let faceEntity = self.faceEntity else { return }
         
@@ -78,7 +86,7 @@ class PreviewARView: ARView {
             case .outline:
                 assetName = asset.outlinePreviewImage
             default:
-                assetName = "halalmy"
+                assetName = asset.previewImage
             }
 
             if let uiImage = UIImage(named: assetName),
@@ -148,12 +156,6 @@ class PreviewARView: ARView {
         faceAnchor = nil
         faceEntity = nil
     }
-
-    deinit {
-        subscription?.cancel()
-        session.pause()
-        print("PreviewARView stopped")
-    }
   
     // Tambahan: fungsi untuk mengatur visibilitas desain
     func setDesignVisible(_ visible: Bool) {
@@ -163,4 +165,13 @@ class PreviewARView: ARView {
     func setPreviewVisibility(show: Bool) {
         setDesignVisible(show)
     }
+    
+    func clearFaceTexture() {
+        guard let faceEntity = self.faceEntity else { return }
+        var faceMaterial = PhysicallyBasedMaterial()
+        faceMaterial.baseColor = .init(tint: .clear)
+        faceMaterial.blending = .transparent(opacity: .init(scale: 0.0))
+        faceEntity.model?.materials = [faceMaterial]
+    }
 }
+

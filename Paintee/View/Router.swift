@@ -22,7 +22,7 @@ class Router: ObservableObject {
     @Published var path = NavigationPath()
     
     func navigate(to route: Route) {
-        print("Navigating to: \(route)")
+//        print("Navigating to: \(route)")
         path.append(route)
         print("Current Path Count: \(path.count)")
     }

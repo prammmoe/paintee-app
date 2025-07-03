@@ -13,6 +13,8 @@ struct PreviewView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showTutorial = true
     @State private var showPreviewImage = true
+    @State private var viewAppeared = false
+    @StateObject private var sessionManager = ARFaceSessionManager.shared
     @EnvironmentObject private var router: Router
     
     let asset: FacePaintingAsset
@@ -20,14 +22,16 @@ struct PreviewView: View {
     var body: some View {
         ZStack {
             // AR View with toggle-able preview overlay
-            PreviewARViewContainer(asset: asset, showPreviewImage: showPreviewImage)
-                .edgesIgnoringSafeArea(.all)
+            ARFaceSessionContainer()
+                .ignoresSafeArea(.all)
+                .id("ARContainer_Preview_\(viewAppeared ? "active" : "inactive")")
+            
             VStack {
                 Spacer()
                 
                 VStack(spacing: 12) {
                     Button {
-                        router.navigate(to: .drawingsteptutorialview(asset: asset))
+                        router.navigate(to: .dotview(asset: asset))
                     } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .semibold))
@@ -45,11 +49,10 @@ struct PreviewView: View {
                 .padding(.bottom, 30)
             }
         }
-        
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    dismiss()
+                    router.goBack()
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
@@ -83,7 +86,18 @@ struct PreviewView: View {
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showTutorial) {
             TutorialSheetView()
+        }
+        .onAppear {
+            viewAppeared = true
             
+            // Delay untuk memastikan view sudah ter-render
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sessionManager.resumeSession()
+                sessionManager.applyAsset(asset, type: .preview)
+            }
+        }
+        .onDisappear {
+            viewAppeared = false
         }
     }
 }
@@ -115,8 +129,6 @@ struct TutorialSheetView: View {
             }
             .padding(.horizontal, 40)
             
-          
-            
             Button(action: {
                 dismiss()
             }) {
@@ -137,34 +149,6 @@ struct TutorialSheetView: View {
         .background(Color(.pCream))
         .presentationDetents([.fraction(0.40)])
         .presentationDragIndicator(.hidden)
-        .onDisappear {
-            print("PreviewView disappeared, session will stop (via dismantleUIView)")
-        }
     }
 }
 
-struct PreviewARViewContainer: UIViewRepresentable {
-    let asset: FacePaintingAsset
-    let showPreviewImage: Bool
-    
-    func makeUIView(context: Context) -> ARView {
-        let arView = PreviewARView(frame: .zero)
-        arView.setup(asset: asset, assetType: .preview)
-        arView.setDesignVisible(showPreviewImage)
-        return arView
-    }
-    
-    func updateUIView(_ uiView: ARView, context: Context) {
-        if let arVC = uiView as? PreviewARView {
-            arVC.setDesignVisible(showPreviewImage)
-        }
-    }
-    
-    static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
-        if let customView = uiView as? PreviewARView {
-            customView.stopSession()
-        } else {
-            uiView.session.pause()
-        }
-    }
-}

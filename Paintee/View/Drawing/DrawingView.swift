@@ -15,12 +15,15 @@ struct DrawingView: View {
     @State private var showPreviewImage = true
     @EnvironmentObject private var router: Router
     let asset: FacePaintingAsset
+    @State private var viewAppeared = false
+    @StateObject private var sessionManager = ARFaceSessionManager.shared
+
     
     var body: some View {
         ZStack {
-            DrawingARViewContainer(asset: asset, showPreviewImage: showPreviewImage)
-                .edgesIgnoringSafeArea(.all)
-            
+            ARFaceSessionContainer()
+                .ignoresSafeArea(.all)
+                .id("ARContainer_\(viewAppeared ? "active" : "inactive")") // Force refresh
             VStack {
                 Text("Time to paint it all in!")
                     .font(.subheadline)
@@ -93,8 +96,17 @@ struct DrawingView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            viewAppeared = true
+            
+            // Delay untuk memastikan view sudah ter-render
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sessionManager.resumeSession()
+                sessionManager.applyAsset(asset, type: .outline)
+            }
+        }
         .onDisappear {
-            print("DrawingView disappeared, session will stop (via dismantleUIView)")
+            viewAppeared = false
         }
     }
     
