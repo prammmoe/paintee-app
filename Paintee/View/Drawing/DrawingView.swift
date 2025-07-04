@@ -110,29 +110,4 @@ struct DrawingView: View {
         }
     }
     
-    struct DrawingARViewContainer: UIViewRepresentable {
-        let asset: FacePaintingAsset
-        let showPreviewImage: Bool
-        
-        func makeUIView(context: Context) -> ARView {
-            let arView = DrawingARView(frame: .zero)
-            arView.setup(asset: asset, assetType: .outline)
-            arView.setDesignVisible(showPreviewImage)
-            return arView
-        }
-        
-        func updateUIView(_ uiView: ARView, context: Context) {
-            if let arVC = uiView as? DrawingARView {
-                arVC.setDesignVisible(showPreviewImage)
-            }
-        }
-        
-        static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
-            if let customView = uiView as? DrawingARView {
-                customView.stopSession()
-            } else {
-                uiView.session.pause()
-            }
-        }
-    }
 }

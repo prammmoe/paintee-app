@@ -4,24 +4,28 @@
 //
 //  Created by Pramuditha Muhammad Ikhwan on 03/07/25.
 //
+
 import RealityKit
 import ARKit
 
 class ARFaceSessionManager: ObservableObject {
     static let shared = ARFaceSessionManager()
     
-    @Published var arView: FacePaintingARView?
     @Published var isSessionActive = false
+    private var arView: FacePaintingARView?
     
     private init() {}
     
-    func createARView() -> FacePaintingARView {
+    func getOrCreateARView() -> FacePaintingARView {
         if let existingView = arView {
             return existingView
         }
         
         let newView = FacePaintingARView(frame: .zero)
+        newView.backgroundColor = UIColor.clear
+        newView.automaticallyConfigureSession = false
         arView = newView
+        
         return newView
     }
     
@@ -30,7 +34,9 @@ class ARFaceSessionManager: ObservableObject {
         
         if !isSessionActive {
             arView.setupSession()
-            isSessionActive = true
+            DispatchQueue.main.async {
+                self.isSessionActive = true
+            }
         }
     }
     
@@ -48,7 +54,9 @@ class ARFaceSessionManager: ObservableObject {
     
     func pauseSession() {
         arView?.session.pause()
-        isSessionActive = false
+        DispatchQueue.main.async {
+            self.isSessionActive = false
+        }
     }
     
     func resumeSession() {
@@ -56,13 +64,17 @@ class ARFaceSessionManager: ObservableObject {
         
         if !isSessionActive {
             arView.session.run(arView.session.configuration ?? ARFaceTrackingConfiguration())
-            isSessionActive = true
+            DispatchQueue.main.async {
+                self.isSessionActive = true
+            }
         }
     }
     
     func stopSession() {
         arView?.stopSession()
-        isSessionActive = false
+        DispatchQueue.main.async {
+            self.isSessionActive = false
+        }
     }
     
     func resetSession() {

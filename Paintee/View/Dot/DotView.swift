@@ -21,9 +21,9 @@ struct DotView: View {
     
     var body: some View {
         ZStack {
-            ARFaceSessionContainer()
+            DotARSessionContainer(viewModel: viewModel)
                 .ignoresSafeArea(.all)
-                .id("ARContainer_\(viewAppeared ? "active" : "inactive")") // Force refresh
+                .id("DotARSessionContainer_\(viewAppeared ? "active" : "inactive")") // Force refresh
             
             VStack {
                 Text(viewModel.warningMessage)

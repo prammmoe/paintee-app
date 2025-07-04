@@ -9,16 +9,10 @@ import SwiftUI
 import RealityKit
 
 struct ARFaceSessionContainer: UIViewRepresentable {
-    @StateObject private var sessionManager = ARFaceSessionManager.shared
+    @ObservedObject private var sessionManager = ARFaceSessionManager.shared
     
     func makeUIView(context: Context) -> FacePaintingARView {
-        let arView = sessionManager.createARView()
-        
-        // Pastikan view dikonfigurasi dengan benar
-        arView.backgroundColor = UIColor.clear
-        arView.automaticallyConfigureSession = false
-        
-        return arView
+        return sessionManager.getOrCreateARView()
     }
     
     func updateUIView(_ uiView: FacePaintingARView, context: Context) {

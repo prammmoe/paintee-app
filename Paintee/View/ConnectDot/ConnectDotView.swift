@@ -110,31 +110,3 @@ struct ConnectDotView: View {
         }
     }
 }
-
-struct ConnectDotARViewContainer: UIViewRepresentable {
-    let asset: FacePaintingAsset
-    let showPreviewImage: Bool
-    
-    func makeUIView(context: Context) -> ARView {
-        let arView = ConnetDotARView(frame: .zero)
-        arView.setup(asset: asset, assetType: .outline)
-        return arView
-    }
-    
-    func updateUIView(_ uiView: ARView, context: Context) {
-        if let arVC = uiView as? ConnetDotARView {
-            arVC.setDesignVisible(showPreviewImage)
-        }
-    }
-    
-    static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
-        if let customView = uiView as? ConnetDotARView {
-            customView.stopSession()
-        } else {
-            uiView.session.pause()
-        }
-    }
-}
-
-
-
