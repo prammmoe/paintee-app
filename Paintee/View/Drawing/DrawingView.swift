@@ -21,7 +21,7 @@ struct DrawingView: View {
     
     var body: some View {
         ZStack {
-            ARFaceSessionContainer()
+            ARFaceSessionContainer(showPreviewImage: showPreviewImage)
                 .ignoresSafeArea(.all)
                 .id("ARContainer_\(viewAppeared ? "active" : "inactive")") // Force refresh
             VStack {
@@ -64,7 +64,7 @@ struct DrawingView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    dismiss()
+                    router.goBack()
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
@@ -109,5 +109,4 @@ struct DrawingView: View {
             viewAppeared = false
         }
     }
-    
 }

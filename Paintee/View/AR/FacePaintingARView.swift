@@ -20,7 +20,7 @@ class FacePaintingARView: ARView {
     var assetType: FacePaintingAssetType?
     
     // Tambahan: kontrol visibilitas desain
-    var isDesignVisible: Bool = true {
+    var isAssetVisible: Bool = true {
         didSet {
             updateFaceTextureFromAsset()
         }
@@ -74,9 +74,8 @@ class FacePaintingARView: ARView {
     
     func updateFaceTextureFromAsset() {
         guard let asset = asset else { return }
-        guard let faceEntity = self.faceEntity else { return }
         
-        if isDesignVisible {
+        if isAssetVisible {
             let assetName: String
             switch assetType {
             case .preview:
@@ -86,7 +85,7 @@ class FacePaintingARView: ARView {
             case .outline:
                 assetName = asset.outlinePreviewImage
             default:
-                assetName = asset.previewImage
+                assetName = "emptyasset"
             }
 
             if let uiImage = UIImage(named: assetName),
@@ -98,10 +97,13 @@ class FacePaintingARView: ARView {
             }
         } else {
             // Hilangkan material desain dari wajah (buat transparan)
-            var faceMaterial = PhysicallyBasedMaterial()
-            faceMaterial.baseColor = .init(tint: .clear)
-            faceMaterial.blending = .transparent(opacity: .init(scale: 0.0))
-            faceEntity.model?.materials = [faceMaterial]
+            if let uiImage = UIImage(named: "emptyasset"),
+               let cgImage = uiImage.cgImage,
+               let flippedImage = flippedVertically(cgImage) {
+                updateFaceEntityTextureUsing(cgImage: flippedImage)
+            } else {
+                print("Warning: Couldn't load face texture asset")
+            }
         }
     }
     
@@ -157,13 +159,12 @@ class FacePaintingARView: ARView {
         faceEntity = nil
     }
   
-    // Tambahan: fungsi untuk mengatur visibilitas desain
-    func setDesignVisible(_ visible: Bool) {
-        isDesignVisible = visible
+    func setAssetVisible(_ visible: Bool) {
+        isAssetVisible = visible
     }
     
     func setPreviewVisibility(show: Bool) {
-        setDesignVisible(show)
+        setAssetVisible(show)
     }
     
     func clearFaceTexture() {

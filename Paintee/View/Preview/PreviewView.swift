@@ -22,7 +22,7 @@ struct PreviewView: View {
     var body: some View {
         ZStack {
             // AR View with toggle-able preview overlay
-            ARFaceSessionContainer()
+            ARFaceSessionContainer(showPreviewImage: showPreviewImage)
                 .ignoresSafeArea(.all)
                 .id("ARContainer_Preview_\(viewAppeared ? "active" : "inactive")")
             
@@ -98,6 +98,11 @@ struct PreviewView: View {
         }
         .onDisappear {
             viewAppeared = false
+        }
+        .onChange(of: router.currentRoute) { oldRoute, newRoute in
+            if newRoute == .homeview {
+                sessionManager.stopSession()
+            }
         }
     }
 }

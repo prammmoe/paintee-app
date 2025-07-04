@@ -86,4 +86,9 @@ class DotViewModel: ObservableObject {
     func stopMonitoring() {
         service.stopDeviceMovementMonitoring()
     }
+    
+    func stopHaptic() {
+        self.warningMessage = ""
+        self.canStartDotting = false
+    }
 }

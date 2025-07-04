@@ -10,12 +10,14 @@ import RealityKit
 
 struct ARFaceSessionContainer: UIViewRepresentable {
     @ObservedObject private var sessionManager = ARFaceSessionManager.shared
+    let showPreviewImage: Bool
     
     func makeUIView(context: Context) -> FacePaintingARView {
         return sessionManager.getOrCreateARView()
     }
     
     func updateUIView(_ uiView: FacePaintingARView, context: Context) {
+        sessionManager.setAssetVisible(showPreviewImage)
         // Pastikan session berjalan ketika view diupdate
         DispatchQueue.main.async {
             if !sessionManager.isSessionActive {

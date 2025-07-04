@@ -12,6 +12,7 @@ struct CameraSnapView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var cameraViewModel = CameraViewModel()
     @State private var showPreview = false
+    @StateObject private var sessionManager = ARFaceSessionManager.shared
     @EnvironmentObject private var router: Router
     
     var body: some View {
@@ -45,7 +46,7 @@ struct CameraSnapView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    dismiss()
+                    router.goBack()
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
@@ -98,6 +99,11 @@ struct CameraSnapView: View {
                 PreviewCapture(image: image, capturedImage: $cameraViewModel.capturedImage)
             } else {
                 EmptyView()
+            }
+        }
+        .onChange(of: router.currentRoute) { oldRoute, newRoute in
+            if newRoute == .homeview {
+                sessionManager.stopSession()
             }
         }
     }

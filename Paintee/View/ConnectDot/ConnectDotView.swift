@@ -20,7 +20,7 @@ struct ConnectDotView: View {
     var body: some View {
         ZStack {
             // AR View with toggle-able preview overlay
-            ARFaceSessionContainer()
+            ARFaceSessionContainer(showPreviewImage: showPreviewImage)
                 .ignoresSafeArea(.all)
                 .id("ARContainer_\(viewAppeared ? "active" : "inactive")") // Force refresh
             
@@ -65,7 +65,7 @@ struct ConnectDotView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    dismiss()
+                    router.goBack()
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")

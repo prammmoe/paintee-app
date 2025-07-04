@@ -15,15 +15,14 @@ struct DotView: View {
     let asset: FacePaintingAsset
     
     @EnvironmentObject private var router: Router
-    @State private var navigateToStepOne = false
     @State private var showPreviewImage = true
     @State private var viewAppeared = false
     
     var body: some View {
         ZStack {
-            DotARSessionContainer(viewModel: viewModel)
+            DotARSessionContainer(viewModel: viewModel, showPreviewImage: showPreviewImage)
                 .ignoresSafeArea(.all)
-                .id("DotARSessionContainer_\(viewAppeared ? "active" : "inactive")") // Force refresh
+                .id("ARContainer_\(viewAppeared ? "active" : "inactive")") // Force refresh
             
             VStack {
                 Text(viewModel.warningMessage)
@@ -55,6 +54,7 @@ struct DotView: View {
                             .background(viewModel.canStartDotting ? Color.pBlue : .pBlue.opacity(0.5))
                             .cornerRadius(15)
                     }
+                    .disabled(!viewModel.canStartDotting)
                     .accessibilityLabel("1. Continue")
                     .accessibilityIdentifier("ConnectContinueButton")
                     .animation(.easeInOut(duration: 0.2), value: viewModel.canStartDotting)
@@ -109,6 +109,7 @@ struct DotView: View {
         }
         .onDisappear {
             viewAppeared = false
+            viewModel.stopHaptic() // Stop haptic
         }
     }
 }

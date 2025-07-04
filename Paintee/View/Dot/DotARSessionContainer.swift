@@ -12,17 +12,17 @@ import ARKit
 struct DotARSessionContainer: UIViewRepresentable {
     @ObservedObject var viewModel: DotViewModel
     @ObservedObject private var sessionManager = ARFaceSessionManager.shared
+    let showPreviewImage: Bool
     
     func makeUIView(context: Context) -> FacePaintingARView {
         let arView = sessionManager.getOrCreateARView()
         
-        // Set delegate to implementation of ARView
         arView.session.delegate = context.coordinator
-        
         return arView
     }
     
     func updateUIView(_ uiView: FacePaintingARView, context: Context) {
+        sessionManager.setAssetVisible(showPreviewImage)
         DispatchQueue.main.async {
             if !sessionManager.isSessionActive {
                 sessionManager.startSession()

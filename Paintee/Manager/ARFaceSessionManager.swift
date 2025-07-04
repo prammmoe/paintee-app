@@ -29,6 +29,10 @@ class ARFaceSessionManager: ObservableObject {
         return newView
     }
     
+    func setAssetVisible(_ visible: Bool) {
+        arView?.isAssetVisible = visible
+    }
+    
     func startSession() {
         guard let arView = arView else { return }
         
@@ -72,6 +76,7 @@ class ARFaceSessionManager: ObservableObject {
     
     func stopSession() {
         arView?.stopSession()
+        arView = nil
         DispatchQueue.main.async {
             self.isSessionActive = false
         }
