@@ -47,15 +47,17 @@ struct OnboardingView: View {
                                 .fontWeight(.bold)
                                 .foregroundColor(.pYellow)
                                 .padding(.horizontal, 40)
+                                .padding(.vertical, -10)
+                
 
                             // Subtitle
-                            Text("Learn to paint your face symmetrically with real-time camera guides. Place dots, connect them, and follow visual steps to build your skill")
+                            Text("Learn to paint your face symmetrically with real-time camera guides. Place dots, connect them, and follow visual steps to build your skill!")
                                 .font(.body)
                                 .foregroundColor(.pCream)
                                 .multilineTextAlignment(.leading)
                                 .padding(.horizontal, 40)
 
-                            Spacer()
+                            
 
                 // Button
                 Button(action: {
@@ -64,7 +66,7 @@ struct OnboardingView: View {
                     }
                 }) {
                     Text("Let’s Get Started")
-                        .fontWeight(.semibold)
+                        .fontWeight(.bold)
                         .foregroundColor(.pBlue)
                         .frame(maxWidth: .infinity)
                         .padding()

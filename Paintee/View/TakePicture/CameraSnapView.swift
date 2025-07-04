@@ -19,55 +19,57 @@ struct CameraSnapView: View {
         GeometryReader { geometry in
             ZStack {
                 CameraPreview(session: cameraViewModel.session)
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .clipped()
-                
-                VStack {
-                    Spacer()
-                    
-                    Button(action: {
-                        cameraViewModel.takePhoto()
-                    }) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.white.opacity(0.8))
-                                .frame(width: 80, height: 80)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .ignoresSafeArea(.all)
+                    .overlay(
+                        HStack(spacing: 25) {
                             
-                            Circle()
-                                .stroke(Color.white, lineWidth: 4)
-                                .frame(width: 65, height: 65)
+                            Button {
+                                cameraViewModel.takePhoto()
+                            } label: {
+                                ZStack {
+                                    Circle().fill(Color.white).frame(width: 80, height: 80)
+                                    Circle().stroke(Color.pBlue, lineWidth: 4).frame(width: 65, height: 65)
+                                }
+                            }
+                            
+                            Button {
+                                router.reset()
+                            } label: {
+                                Image(systemName: "house.fill")
+                                    .font(.system(size: 24, weight: .bold))
+                                    .foregroundColor(.pCream)
+                                    .frame(width: 60, height: 60)
+                                    .background(Color.pBlue)
+                                    .clipShape(Circle())
+                            }
+                            
+                        }
+                            .padding(.bottom, 20)
+                            .offset(x: ((60 + 25) / 2)),
+                        alignment: .bottom
+                    )
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: {
+                                dismiss()
+                            }) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "chevron.left")
+                                    Text("Back")
+                                }
+                                .accessibilityLabel("3. Back")
+                                .accessibilityIdentifier("CameraBackButton")
+                                .foregroundColor(.white)
+                            }
+                        }
+                        ToolbarItem(placement: .principal) {
+                            Text("Snap Your Results")
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
                         }
                     }
-                    .padding(.bottom, 40)
-                }
-            }
-        }
-        .ignoresSafeArea()
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    router.goBack()
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                        Text("Back")
-                    }
-                    .accessibilityLabel("3. Back")
-                    .accessibilityIdentifier("CameraBackButton")
-                    .foregroundColor(.white)
-                }
-            }
-            ToolbarItem(placement: .principal) {
-                Text("Snap Your Results")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-            }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Home") {
-                    router.reset()
-                }
-                .foregroundColor(.white)
             }
         }
         .toolbarBackground(Color.pBlue.opacity(0.5), for: .navigationBar)
@@ -87,6 +89,11 @@ struct CameraSnapView: View {
                 showPreview = true
             }
         }
+        .onChange(of: router.currentRoute) { oldRoute, newRoute in
+            if newRoute == .homeview {
+                sessionManager.stopSession()
+            }
+        }
         .navigationDestination(isPresented: Binding(
             get: { cameraViewModel.capturedImage != nil },
             set: { isPresented in
@@ -101,82 +108,76 @@ struct CameraSnapView: View {
                 EmptyView()
             }
         }
-        .onChange(of: router.currentRoute) { oldRoute, newRoute in
-            if newRoute == .homeview {
-                sessionManager.stopSession()
+    }
+    
+    struct CameraPreview: UIViewRepresentable {
+        let session: AVCaptureSession
+        
+        func makeUIView(context: Context) -> UIView {
+            let view = UIView()
+            view.backgroundColor = .black
+            
+            let previewLayer = AVCaptureVideoPreviewLayer(session: session)
+            previewLayer.videoGravity = .resizeAspectFill
+            
+            view.layer.addSublayer(previewLayer)
+            
+            // Store the preview layer for later access
+            view.tag = 999
+            
+            return view
+        }
+        
+        func updateUIView(_ uiView: UIView, context: Context) {
+            // Update the preview layer frame when the view bounds change
+            DispatchQueue.main.async {
+                if let previewLayer = uiView.layer.sublayers?.first as? AVCaptureVideoPreviewLayer {
+                    previewLayer.frame = uiView.bounds
+                }
             }
         }
     }
-}
-
-struct CameraPreview: UIViewRepresentable {
-    let session: AVCaptureSession
     
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        view.backgroundColor = .black
+    // Alternative CameraPreview implementation that's more reliable
+    struct CameraPreviewAlternative: UIViewRepresentable {
+        let session: AVCaptureSession
         
-        let previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer.videoGravity = .resizeAspectFill
+        func makeUIView(context: Context) -> CameraPreviewUIView {
+            return CameraPreviewUIView(session: session)
+        }
         
-        view.layer.addSublayer(previewLayer)
-        
-        // Store the preview layer for later access
-        view.tag = 999
-        
-        return view
+        func updateUIView(_ uiView: CameraPreviewUIView, context: Context) {
+            // No need to update anything here as the custom view handles it
+        }
     }
     
-    func updateUIView(_ uiView: UIView, context: Context) {
-        // Update the preview layer frame when the view bounds change
-        DispatchQueue.main.async {
-            if let previewLayer = uiView.layer.sublayers?.first as? AVCaptureVideoPreviewLayer {
-                previewLayer.frame = uiView.bounds
+    class CameraPreviewUIView: UIView {
+        private var previewLayer: AVCaptureVideoPreviewLayer?
+        
+        init(session: AVCaptureSession) {
+            super.init(frame: .zero)
+            setupPreviewLayer(session: session)
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        private func setupPreviewLayer(session: AVCaptureSession) {
+            backgroundColor = .black
+            
+            previewLayer = AVCaptureVideoPreviewLayer(session: session)
+            previewLayer?.videoGravity = .resizeAspectFill
+            
+            if let previewLayer = previewLayer {
+                layer.addSublayer(previewLayer)
             }
         }
-    }
-}
-
-// Alternative CameraPreview implementation that's more reliable
-struct CameraPreviewAlternative: UIViewRepresentable {
-    let session: AVCaptureSession
-    
-    func makeUIView(context: Context) -> CameraPreviewUIView {
-        return CameraPreviewUIView(session: session)
-    }
-    
-    func updateUIView(_ uiView: CameraPreviewUIView, context: Context) {
-        // No need to update anything here as the custom view handles it
-    }
-}
-
-class CameraPreviewUIView: UIView {
-    private var previewLayer: AVCaptureVideoPreviewLayer?
-    
-    init(session: AVCaptureSession) {
-        super.init(frame: .zero)
-        setupPreviewLayer(session: session)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func setupPreviewLayer(session: AVCaptureSession) {
-        backgroundColor = .black
         
-        previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer?.videoGravity = .resizeAspectFill
-        
-        if let previewLayer = previewLayer {
-            layer.addSublayer(previewLayer)
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            previewLayer?.frame = bounds
         }
     }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        previewLayer?.frame = bounds
-    }
 }
-
 

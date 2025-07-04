@@ -14,6 +14,7 @@ class CameraViewModel: NSObject, ObservableObject {
     @Published var capturedImage: UIImage? = nil
     @Published var isSessionRunning = false
     private var isConfigured = false
+    @Published var permissionDenied = false
 
     override init() {
         super.init()
@@ -45,12 +46,15 @@ class CameraViewModel: NSObject, ObservableObject {
                     if granted {
                         self.setupCamera()
                     } else {
+                        self.permissionDenied = true
                         print("Camera permission denied")
                     }
                 }
             }
         case .denied, .restricted:
-            print("Camera access denied or restricted")
+            DispatchQueue.main.async {
+                            self.permissionDenied = true
+                        }
         @unknown default:
             print("Unknown camera authorization status")
         }

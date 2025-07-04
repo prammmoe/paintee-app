@@ -47,7 +47,7 @@ struct DotView: View {
                         router.navigate(to: .connectdotview(asset: asset))
                     } label: {
                         Text("Continue")
-                            .font(.system(size: 17, weight: .semibold))
+                            .font(.system(size: 17, weight: .bold))
                             .foregroundColor(.pCream)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
