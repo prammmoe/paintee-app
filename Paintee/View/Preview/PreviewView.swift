@@ -14,6 +14,8 @@ struct PreviewView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showTutorial = false
     @State private var showPreviewImage = true
+    @State private var viewAppeared = false
+    @StateObject private var sessionManager = ARFaceSessionManager.shared
     @EnvironmentObject private var router: Router
     @State private var permissionDenied = false
     
@@ -22,14 +24,16 @@ struct PreviewView: View {
     var body: some View {
         ZStack {
             // AR View with toggle-able preview overlay
-            PreviewARViewContainer(asset: asset, showPreviewImage: showPreviewImage)
-                .edgesIgnoringSafeArea(.all)
+            ARFaceSessionContainer(showPreviewImage: showPreviewImage)
+                .ignoresSafeArea(.all)
+                .id("ARContainer_Preview_\(viewAppeared ? "active" : "inactive")")
+            
             VStack {
                 Spacer()
                 
                 VStack(spacing: 12) {
                     Button {
-                        router.navigate(to: .drawingsteptutorialview(asset: asset))
+                        router.navigate(to: .dotview(asset: asset))
                     } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .bold))
@@ -47,11 +51,10 @@ struct PreviewView: View {
                 .padding(.bottom, 30)
             }
         }
-        
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    dismiss()
+                    router.goBack()
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
@@ -85,46 +88,60 @@ struct PreviewView: View {
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showTutorial) {
             TutorialSheetView()
-            
-            
         }
         .onAppear {
-                    let status = AVCaptureDevice.authorizationStatus(for: .video)
-                    switch status {
-                    case .notDetermined:
-                        
-                        AVCaptureDevice.requestAccess(for: .video) { granted in
-                            if !granted {
-                                DispatchQueue.main.async { permissionDenied = true }
-                            }
-                        }
-                    case .denied, .restricted:
-                       
-                        permissionDenied = true
-                    default:
-                        break
-                    }
-                }
-               
-                .alert("Camera Access Required",
-                       isPresented: $permissionDenied
-                ) {
-                    Button("Open Settings") {
-                        guard let url = URL(string: UIApplication.openSettingsURLString)
-                        else { return }
-                        UIApplication.shared.open(url)
-                    }
-                    Button("Cancel", role: .cancel) {}
-                } message: {
-                    Text("Please allow camera access in Settings to see the AR preview.")
-                }
-            
+            viewAppeared = true
+            // Delay untuk memastikan view sudah ter-render
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sessionManager.resumeSession()
+                sessionManager.applyAsset(asset, type: .preview)
+            }
+        }
+        .onDisappear {
+            viewAppeared = false
+        }
+        .onChange(of: router.currentRoute) { oldRoute, newRoute in
+            if newRoute == .homeview {
+                sessionManager.stopSession()
+            }
+        }
         .onAppear {
-              if !Self.didShowTutorialThisSession {
+            let status = AVCaptureDevice.authorizationStatus(for: .video)
+            switch status {
+            case .notDetermined:
+                
+                AVCaptureDevice.requestAccess(for: .video) { granted in
+                    if !granted {
+                        DispatchQueue.main.async { permissionDenied = true }
+                    }
+                }
+            case .denied, .restricted:
+                
+                permissionDenied = true
+            default:
+                break
+            }
+        }
+        
+        .alert("Camera Access Required",
+               isPresented: $permissionDenied
+        ) {
+            Button("Open Settings") {
+                guard let url = URL(string: UIApplication.openSettingsURLString)
+                else { return }
+                UIApplication.shared.open(url)
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Please allow camera access in Settings to see the AR preview.")
+        }
+        
+        .onAppear {
+            if !Self.didShowTutorialThisSession {
                 showTutorial = true
                 Self.didShowTutorialThisSession = true
-              }
             }
+        }
     }
 }
 
@@ -155,8 +172,6 @@ struct TutorialSheetView: View {
             }
             .padding(.horizontal, 40)
             
-          
-            
             Button(action: {
                 dismiss()
             }) {
@@ -177,34 +192,6 @@ struct TutorialSheetView: View {
         .background(Color(.pCream))
         .presentationDetents([.fraction(0.40)])
         .presentationDragIndicator(.hidden)
-        .onDisappear {
-            print("PreviewView disappeared, session will stop (via dismantleUIView)")
-        }
     }
 }
 
-struct PreviewARViewContainer: UIViewRepresentable {
-    let asset: FacePaintingAsset
-    let showPreviewImage: Bool
-    
-    func makeUIView(context: Context) -> ARView {
-        let arView = PreviewARView(frame: .zero)
-        arView.setup(asset: asset, assetType: .preview)
-        arView.setDesignVisible(showPreviewImage)
-        return arView
-    }
-    
-    func updateUIView(_ uiView: ARView, context: Context) {
-        if let arVC = uiView as? PreviewARView {
-            arVC.setDesignVisible(showPreviewImage)
-        }
-    }
-    
-    static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
-        if let customView = uiView as? PreviewARView {
-            customView.stopSession()
-        } else {
-            uiView.session.pause()
-        }
-    }
-}

@@ -15,12 +15,15 @@ struct DrawingView: View {
     @State private var showPreviewImage = true
     @EnvironmentObject private var router: Router
     let asset: FacePaintingAsset
+    @State private var viewAppeared = false
+    @StateObject private var sessionManager = ARFaceSessionManager.shared
+
     
     var body: some View {
         ZStack {
-            DrawingARViewContainer(asset: asset, showPreviewImage: showPreviewImage)
-                .edgesIgnoringSafeArea(.all)
-            
+            ARFaceSessionContainer(showPreviewImage: showPreviewImage)
+                .ignoresSafeArea(.all)
+                .id("ARContainer_\(viewAppeared ? "active" : "inactive")") // Force refresh
             VStack {
                 Text("Time to paint it all in!")
                     .font(.subheadline)
@@ -61,7 +64,7 @@ struct DrawingView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    dismiss()
+                    router.goBack()
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
@@ -93,34 +96,17 @@ struct DrawingView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            viewAppeared = true
+            
+            // Delay untuk memastikan view sudah ter-render
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sessionManager.resumeSession()
+                sessionManager.applyAsset(asset, type: .outline)
+            }
+        }
         .onDisappear {
-            print("DrawingView disappeared, session will stop (via dismantleUIView)")
-        }
-    }
-    
-    struct DrawingARViewContainer: UIViewRepresentable {
-        let asset: FacePaintingAsset
-        let showPreviewImage: Bool
-        
-        func makeUIView(context: Context) -> ARView {
-            let arView = DrawingARView(frame: .zero)
-            arView.setup(asset: asset, assetType: .outline)
-            arView.setDesignVisible(showPreviewImage)
-            return arView
-        }
-        
-        func updateUIView(_ uiView: ARView, context: Context) {
-            if let arVC = uiView as? DrawingARView {
-                arVC.setDesignVisible(showPreviewImage)
-            }
-        }
-        
-        static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
-            if let customView = uiView as? DrawingARView {
-                customView.stopSession()
-            } else {
-                uiView.session.pause()
-            }
+            viewAppeared = false
         }
     }
 }

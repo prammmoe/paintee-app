@@ -13,6 +13,7 @@ struct PreviewCapture: View {
     let image: UIImage
     @Binding var capturedImage: UIImage?
     @State private var showSaveAlert = false
+    @StateObject private var sessionManager = ARFaceSessionManager.shared
     
     private var mirroredImage: UIImage {
             guard
@@ -82,6 +83,11 @@ struct PreviewCapture: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .onChange(of: router.currentRoute) { oldRoute, newRoute in
+            if newRoute == .homeview {
+                sessionManager.stopSession()
+            }
+        }
     }
     
     private func saveImageToGallery(_ image: UIImage) {

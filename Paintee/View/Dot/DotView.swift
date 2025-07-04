@@ -4,7 +4,6 @@
 //
 //  Created by Pramuditha Muhammad Ikhwan on 14/06/25.
 //
-
 import SwiftUI
 import ARKit
 import RealityKit
@@ -12,16 +11,18 @@ import RealityKit
 struct DotView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = DotViewModel()
+    @StateObject private var sessionManager = ARFaceSessionManager.shared
     let asset: FacePaintingAsset
     
     @EnvironmentObject private var router: Router
-    @State private var navigateToStepOne = false
     @State private var showPreviewImage = true
+    @State private var viewAppeared = false
     
     var body: some View {
         ZStack {
-            CalibrationARViewContainer(viewModel: viewModel, asset: asset, showPreviewImage: showPreviewImage)
+            DotARSessionContainer(viewModel: viewModel, showPreviewImage: showPreviewImage)
                 .ignoresSafeArea(.all)
+                .id("ARContainer_\(viewAppeared ? "active" : "inactive")") // Force refresh
             
             VStack {
                 Text(viewModel.warningMessage)
@@ -39,7 +40,6 @@ struct DotView: View {
             .ignoresSafeArea(edges: .top)
             
             VStack {
-                
                 Spacer()
                 
                 VStack(spacing: 12) {
@@ -54,9 +54,9 @@ struct DotView: View {
                             .background(viewModel.canStartDotting ? Color.pBlue : .pBlue.opacity(0.5))
                             .cornerRadius(15)
                     }
+                    .disabled(!viewModel.canStartDotting)
                     .accessibilityLabel("1. Continue")
                     .accessibilityIdentifier("ConnectContinueButton")
-                    .disabled(!viewModel.canStartDotting)
                     .animation(.easeInOut(duration: 0.2), value: viewModel.canStartDotting)
                 }
                 .padding(.horizontal, 20)
@@ -66,7 +66,8 @@ struct DotView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    dismiss()
+                    // Pastikan session tetap aktif saat navigasi back
+                    router.goBack()
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
@@ -98,58 +99,17 @@ struct DotView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            viewAppeared = true
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sessionManager.resumeSession()
+                sessionManager.applyAsset(asset, type: .dot)
+            }
+        }
         .onDisappear {
-            viewModel.stopMonitoring()
-            print("DotView disappeared, session will stop (via dismantleUIView)")
-        }
-    }
-    
-    struct CalibrationARViewContainer: UIViewRepresentable {
-        @ObservedObject var viewModel: DotViewModel
-        let asset: FacePaintingAsset
-        let showPreviewImage: Bool
-        
-        func makeUIView(context: Context) -> ARView {
-            let arView = DotARView(frame: .zero)
-            arView.setup(asset: asset, assetType: .dot)
-            arView.session.delegate = context.coordinator
-            
-            return arView
-        }
-        
-        func updateUIView(_ uiView: ARView, context: Context) {
-            if let arVC = uiView as? DotARView {
-                arVC.setDesignVisible(showPreviewImage)
-            }
-        }
-        func makeCoordinator() -> Coordinator {
-            Coordinator(viewModel: viewModel)
-        }
-        
-        static func dismantleUIView(_ uiView: ARView, coordinator: Coordinator) {
-            if let customARView = uiView as? DotARView {
-                customARView.stopSession()
-            } else {
-                uiView.session.pause()
-            }
-        }
-        
-        class Coordinator: NSObject, ARSessionDelegate {
-            let viewModel: DotViewModel
-            
-            init(viewModel: DotViewModel) {
-                self.viewModel = viewModel
-            }
-            
-            private var lastProcessTime = Date()
-            
-            func session(_ session: ARSession, didUpdate frame: ARFrame) {
-                let now = Date()
-                if now.timeIntervalSince(lastProcessTime) > 0.3 {
-                    lastProcessTime = now
-                    viewModel.analyzeFrame(frame)
-                }
-            }
+            viewAppeared = false
+            viewModel.stopHaptic() // Stop haptic
         }
     }
 }

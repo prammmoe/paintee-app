@@ -12,14 +12,17 @@ import RealityKit
 struct ConnectDotView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showPreviewImage = true
+    @StateObject private var sessionManager = ARFaceSessionManager.shared
     let asset: FacePaintingAsset
     @EnvironmentObject private var router: Router
+    @State private var viewAppeared = false
     
     var body: some View {
         ZStack {
             // AR View with toggle-able preview overlay
-            ConnectDotARViewContainer(asset: asset, showPreviewImage: showPreviewImage)
-                .edgesIgnoringSafeArea(.all)
+            ARFaceSessionContainer(showPreviewImage: showPreviewImage)
+                .ignoresSafeArea(.all)
+                .id("ARContainer_\(viewAppeared ? "active" : "inactive")") // Force refresh
             
             VStack {
                 Text("Start connecting the dots and make the outline!")
@@ -62,7 +65,7 @@ struct ConnectDotView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    dismiss()
+                    router.goBack()
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
@@ -94,36 +97,16 @@ struct ConnectDotView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            viewAppeared = true
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sessionManager.resumeSession()
+                sessionManager.applyAsset(asset, type: .dot)
+            }
+        }
         .onDisappear {
-            print("ConnectDotView disappeared, session will stop (via dismantleUIView)")
+            viewAppeared = false
         }
     }
 }
-
-struct ConnectDotARViewContainer: UIViewRepresentable {
-    let asset: FacePaintingAsset
-    let showPreviewImage: Bool
-    
-    func makeUIView(context: Context) -> ARView {
-        let arView = ConnetDotARView(frame: .zero)
-        arView.setup(asset: asset, assetType: .outline)
-        return arView
-    }
-    
-    func updateUIView(_ uiView: ARView, context: Context) {
-        if let arVC = uiView as? ConnetDotARView {
-            arVC.setDesignVisible(showPreviewImage)
-        }
-    }
-    
-    static func dismantleUIView(_ uiView: ARView, coordinator: ()) {
-        if let customView = uiView as? ConnetDotARView {
-            customView.stopSession()
-        } else {
-            uiView.session.pause()
-        }
-    }
-}
-
-
-

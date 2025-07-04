@@ -9,7 +9,6 @@ import SwiftUI
 
 struct OnboardingView: View {
     @State private var animateStars = false
-//    @State private var showNextView = false
     @Binding var hasCompletedOnboarding: Bool
     
     var body: some View {

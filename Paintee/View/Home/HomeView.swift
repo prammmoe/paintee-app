@@ -75,8 +75,6 @@ struct HomeView: View {
             }
             .navigationDestination(for: Route.self) { route in
                 switch route {
-                    case .onboardingview:
-                    OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
                     case .homeview:
                     HomeView(hasCompletedOnboarding: $hasCompletedOnboarding)
                     case .previewview(let asset):
