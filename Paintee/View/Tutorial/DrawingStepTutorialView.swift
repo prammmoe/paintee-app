@@ -49,7 +49,7 @@ struct DrawingStepTutorialView: View {
                 Text("Drawing Steps")
                     .font(.system(size: isWideScreen ? 44 : 36, weight: .heavy))
                     .foregroundColor(Color("PYellow"))
-                    .padding(.top, isWideScreen ? 20 : 10)
+                    .padding(.top, isWideScreen ? 30 : 20)
                 
                 // Grid
                 LazyVGrid(columns: gridColumns, spacing: isWideScreen ? 40 : 30) {
