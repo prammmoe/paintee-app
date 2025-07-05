@@ -49,7 +49,7 @@ struct DrawingStepTutorialView: View {
                 Text("Drawing Steps")
                     .font(.system(size: isWideScreen ? 44 : 36, weight: .heavy))
                     .foregroundColor(Color("PYellow"))
-                    .padding(.top, isWideScreen ? 20 : 10)
+                    .padding(.top, isWideScreen ? 30 : 20)
                 
                 // Grid
                 LazyVGrid(columns: gridColumns, spacing: isWideScreen ? 40 : 30) {
@@ -77,9 +77,9 @@ struct DrawingStepTutorialView: View {
                 
                 // Continue Button
                 Button(action: {
-                    router.navigate(to: .dotview(asset: asset))
+                    dismiss()
                 }) {
-                    Text("Continue")
+                    Text("Okay")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.pBlue)
                         .frame(maxWidth: .infinity)
@@ -89,8 +89,8 @@ struct DrawingStepTutorialView: View {
                 }
                 .padding(.horizontal, isWideScreen ? 30 : 20)
                 .padding(.bottom, isWideScreen ? 40 : 30)
-                .accessibilityLabel("1. Continue")
-                .accessibilityIdentifier("DrawingStepsContinueButton")
+                .accessibilityLabel("1. Okay")
+                .accessibilityIdentifier("DrawingStepsOkayButton")
             }
         }
         .navigationBarBackButtonHidden(true)

@@ -87,8 +87,11 @@ struct PreviewView: View {
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showTutorial) {
-            TutorialSheetView()
+            DrawingStepTutorialView(asset: asset)
         }
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(Color.clear)
         .onAppear {
             viewAppeared = true
             // Delay untuk memastikan view sudah ter-render
