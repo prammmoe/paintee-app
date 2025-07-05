@@ -77,9 +77,9 @@ struct DrawingStepTutorialView: View {
                 
                 // Continue Button
                 Button(action: {
-                    router.navigate(to: .dotview(asset: asset))
+                    dismiss()
                 }) {
-                    Text("Continue")
+                    Text("Okay")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.pBlue)
                         .frame(maxWidth: .infinity)
@@ -89,8 +89,8 @@ struct DrawingStepTutorialView: View {
                 }
                 .padding(.horizontal, isWideScreen ? 30 : 20)
                 .padding(.bottom, isWideScreen ? 40 : 30)
-                .accessibilityLabel("1. Continue")
-                .accessibilityIdentifier("DrawingStepsContinueButton")
+                .accessibilityLabel("1. Okay")
+                .accessibilityIdentifier("DrawingStepsOkayButton")
             }
         }
         .navigationBarBackButtonHidden(true)

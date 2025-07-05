@@ -86,9 +86,12 @@ struct PreviewView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
-        .sheet(isPresented: $showTutorial) {
-            TutorialSheetView()
+        .fullScreenCover(isPresented: $showTutorial) {
+            DrawingStepTutorialView(asset: asset)
         }
+//        .sheet(isPresented: $showTutorial) {
+//            TutorialSheetView()
+//        }
         .onAppear {
             viewAppeared = true
             // Delay untuk memastikan view sudah ter-render
