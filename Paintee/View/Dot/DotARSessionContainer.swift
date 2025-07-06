@@ -34,7 +34,7 @@ struct DotARSessionContainer: UIViewRepresentable {
         Coordinator(viewModel: viewModel)
     }
     
-    static func dismantleUIView(_ uiView: FacePaintingARView, coordinator: ()) {
+    static func dismantleUIView(_ uiView: FacePaintingARView, coordinator: Coordinator) {
         // Jangan stop session di sini, biarkan tetap running
         print("ARView dismantled, session tetap aktif")
     }
