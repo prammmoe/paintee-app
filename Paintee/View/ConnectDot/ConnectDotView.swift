@@ -102,7 +102,7 @@ struct ConnectDotView: View {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 sessionManager.resumeSession()
-                sessionManager.applyAsset(asset, type: .dot)
+                sessionManager.applyAsset(asset, type: .outline)
             }
         }
         .onDisappear {
