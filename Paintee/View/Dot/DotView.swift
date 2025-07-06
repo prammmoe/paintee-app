@@ -109,6 +109,7 @@ struct DotView: View {
         }
         .onDisappear {
             viewAppeared = false
+            viewModel.stopMonitoring() // Stop monitoring
             viewModel.stopHaptic() // Stop haptic
         }
     }
