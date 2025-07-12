@@ -15,15 +15,15 @@ struct PreviewView: View {
     @State private var showTutorial = false
     @State private var showPreviewImage = true
     @State private var viewAppeared = false
+    @State private var permissionDenied = false
+    
     @StateObject private var sessionManager = ARFaceSessionManager.shared
     @EnvironmentObject private var router: Router
-    @State private var permissionDenied = false
     
     let asset: FacePaintingAsset
     
     var body: some View {
         ZStack {
-            // AR View with toggle-able preview overlay
             ARFaceSessionContainer(showPreviewImage: showPreviewImage)
                 .ignoresSafeArea(.all)
                 .id("ARContainer_Preview_\(viewAppeared ? "active" : "inactive")")
@@ -33,7 +33,9 @@ struct PreviewView: View {
                 
                 VStack(spacing: 12) {
                     Button {
-                        router.navigate(to: .dotview(asset: asset))
+                        router.navigate(
+                            to: .dotview(asset: asset)
+                        )
                     } label: {
                         Text("Continue with this design")
                             .font(.system(size: 17, weight: .bold))
@@ -94,7 +96,6 @@ struct PreviewView: View {
         .presentationBackground(Color.clear)
         .onAppear {
             viewAppeared = true
-            // Delay untuk memastikan view sudah ter-render
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 sessionManager.resumeSession()
                 sessionManager.applyAsset(asset, type: .preview)
@@ -112,16 +113,26 @@ struct PreviewView: View {
             let status = AVCaptureDevice.authorizationStatus(for: .video)
             switch status {
             case .notDetermined:
-                
                 AVCaptureDevice.requestAccess(for: .video) { granted in
-                    if !granted {
-                        DispatchQueue.main.async { permissionDenied = true }
+                    DispatchQueue.main.async {
+                        if granted {
+                            if !Self.didShowTutorialThisSession {
+                                showTutorial = true
+                                Self.didShowTutorialThisSession = true
+                            }
+                        } else {
+                            permissionDenied = true
+                        }
                     }
                 }
+            case .authorized:
+                if !Self.didShowTutorialThisSession {
+                    showTutorial = true
+                    Self.didShowTutorialThisSession = true
+                }
             case .denied, .restricted:
-                
                 permissionDenied = true
-            default:
+            @unknown default:
                 break
             }
         }
@@ -134,16 +145,11 @@ struct PreviewView: View {
                 else { return }
                 UIApplication.shared.open(url)
             }
-            Button("Cancel", role: .cancel) {}
+            Button("Cancel", role: .cancel) {
+                router.goBack()
+            }
         } message: {
             Text("Please allow camera access in Settings to see the AR preview.")
-        }
-        
-        .onAppear {
-            if !Self.didShowTutorialThisSession {
-                showTutorial = true
-                Self.didShowTutorialThisSession = true
-            }
         }
     }
 }
@@ -153,7 +159,6 @@ struct TutorialSheetView: View {
     
     var body: some View {
         VStack(spacing: 24) {
-            // Handle indicator
             RoundedRectangle(cornerRadius: 2)
                 .fill(Color.pBlue)
                 .frame(width: 40, height: 4)
