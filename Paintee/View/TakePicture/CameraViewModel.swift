@@ -13,8 +13,9 @@ class CameraViewModel: NSObject, ObservableObject {
     private let output = AVCapturePhotoOutput()
     @Published var capturedImage: UIImage? = nil
     @Published var isSessionRunning = false
-    private var isConfigured = false
     @Published var permissionDenied = false
+    
+    private var isConfigured = false
 
     override init() {
         super.init()
