@@ -18,7 +18,7 @@ struct ARFaceSessionContainer: UIViewRepresentable {
     
     func updateUIView(_ uiView: FacePaintingARView, context: Context) {
         sessionManager.setAssetVisible(showPreviewImage)
-        // Pastikan session berjalan ketika view diupdate
+
         DispatchQueue.main.async {
             if !sessionManager.isSessionActive {
                 sessionManager.startSession()
@@ -27,7 +27,6 @@ struct ARFaceSessionContainer: UIViewRepresentable {
     }
     
     static func dismantleUIView(_ uiView: FacePaintingARView, coordinator: ()) {
-        // Jangan stop session di sini, biarkan tetap running
         print("ARView dismantled, session tetap aktif")
     }
 }

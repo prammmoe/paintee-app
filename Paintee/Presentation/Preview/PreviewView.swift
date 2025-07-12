@@ -95,11 +95,8 @@ struct PreviewView: View {
         .presentationDragIndicator(.visible)
         .presentationBackground(Color.clear)
         .onAppear {
-            viewAppeared = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                sessionManager.resumeSession()
-                sessionManager.applyAsset(asset, type: .preview)
-            }
+            handlePreviewSession()
+            handleCameraAccess()
         }
         .onDisappear {
             viewAppeared = false
@@ -109,34 +106,6 @@ struct PreviewView: View {
                 sessionManager.stopSession()
             }
         }
-        .onAppear {
-            let status = AVCaptureDevice.authorizationStatus(for: .video)
-            switch status {
-            case .notDetermined:
-                AVCaptureDevice.requestAccess(for: .video) { granted in
-                    DispatchQueue.main.async {
-                        if granted {
-                            if !Self.didShowTutorialThisSession {
-                                showTutorial = true
-                                Self.didShowTutorialThisSession = true
-                            }
-                        } else {
-                            permissionDenied = true
-                        }
-                    }
-                }
-            case .authorized:
-                if !Self.didShowTutorialThisSession {
-                    showTutorial = true
-                    Self.didShowTutorialThisSession = true
-                }
-            case .denied, .restricted:
-                permissionDenied = true
-            @unknown default:
-                break
-            }
-        }
-        
         .alert("Camera Access Required",
                isPresented: $permissionDenied
         ) {
@@ -152,54 +121,42 @@ struct PreviewView: View {
             Text("Please allow camera access in Settings to see the AR preview.")
         }
     }
-}
-
-struct TutorialSheetView: View {
-    @Environment(\.dismiss) private var dismiss
     
-    var body: some View {
-        VStack(spacing: 24) {
-            RoundedRectangle(cornerRadius: 2)
-                .fill(Color.pBlue)
-                .frame(width: 40, height: 4)
-                .padding(.top, 8)
-            
-            Spacer()
-            
-            VStack(spacing: 16) {
-                Text("Preview your design!")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.pBlue)
-                
-                Text("You can use this design or pick another.\nThe colors shown are just examples,\nfeel free to get creative!")
-                    .font(.body)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.pBlue)
-            }
-            .padding(.horizontal, 40)
-            
-            Button(action: {
-                dismiss()
-            }) {
-                Text("Okay")
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(.pBlue)
-                    .cornerRadius(15)
-                
-            }
-            .padding(.horizontal, 40)
-            .padding(.bottom, 34)
-            .accessibilityLabel("1. Continue")
-            .accessibilityIdentifier("ConnectContinueButton")
+    private func handlePreviewSession() {
+        viewAppeared = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            sessionManager.resumeSession()
+            sessionManager.applyAsset(asset, type: .preview)
         }
-        .background(Color(.pCream))
-        .presentationDetents([.fraction(0.40)])
-        .presentationDragIndicator(.hidden)
+    }
+    
+    private func handleCameraAccess() {
+        let status = AVCaptureDevice.authorizationStatus(for: .video)
+        switch status {
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                DispatchQueue.main.async {
+                    if granted {
+                        if !Self.didShowTutorialThisSession {
+                            showTutorial = true
+                            Self.didShowTutorialThisSession = true
+                        }
+                    } else {
+                        permissionDenied = true
+                    }
+                }
+            }
+        case .authorized:
+            if !Self.didShowTutorialThisSession {
+                showTutorial = true
+                Self.didShowTutorialThisSession = true
+            }
+        case .denied, .restricted:
+            permissionDenied = true
+        @unknown default:
+            break
+        }
     }
 }
+
 

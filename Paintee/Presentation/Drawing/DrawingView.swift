@@ -97,16 +97,19 @@ struct DrawingView: View {
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
         .onAppear {
-            viewAppeared = true
-            
-            // Delay untuk memastikan view sudah ter-render
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                sessionManager.resumeSession()
-                sessionManager.applyAsset(asset, type: .outline)
-            }
+            handleDrawingSession()
         }
         .onDisappear {
             viewAppeared = false
+        }
+    }
+    
+    private func handleDrawingSession() {
+        viewAppeared = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            sessionManager.resumeSession()
+            sessionManager.applyAsset(asset, type: .outline)
         }
     }
 }

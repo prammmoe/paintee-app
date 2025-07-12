@@ -19,7 +19,6 @@ class FacePaintingARView: ARView {
     var asset: FacePaintingAsset?
     var assetType: FacePaintingAssetType?
     
-    // Tambahan: kontrol visibilitas desain
     var isAssetVisible: Bool = true {
         didSet {
             updateFaceTextureFromAsset()
@@ -58,7 +57,6 @@ class FacePaintingARView: ARView {
             print("Warning: Could not load sparkly texture: \(error)")
         }
         
-        // Configure AR session
         let configuration = ARFaceTrackingConfiguration()
         configuration.isLightEstimationEnabled = true
         session.run(configuration, options: [
@@ -96,7 +94,6 @@ class FacePaintingARView: ARView {
                 print("Warning: Couldn't load face texture asset")
             }
         } else {
-            // Hilangkan material desain dari wajah (buat transparan)
             if let uiImage = UIImage(named: "emptyasset"),
                let cgImage = uiImage.cgImage,
                let flippedImage = flippedVertically(cgImage) {

@@ -98,15 +98,19 @@ struct ConnectDotView: View {
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
         .onAppear {
-            viewAppeared = true
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                sessionManager.resumeSession()
-                sessionManager.applyAsset(asset, type: .outline)
-            }
+            handleConnectDotSession()
         }
         .onDisappear {
             viewAppeared = false
+        }
+    }
+    
+    private func handleConnectDotSession() {
+        viewAppeared = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            sessionManager.resumeSession()
+            sessionManager.applyAsset(asset, type: .outline)
         }
     }
 }

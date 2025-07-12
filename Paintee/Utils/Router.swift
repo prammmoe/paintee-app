@@ -46,7 +46,6 @@ class Router: ObservableObject {
         print("\n=== Path Count back ===")
         print("Current path count is: \(path.count)")
         
-        // Debug
         print("Going back to \(currentRoute ?? .homeview)")
     }
 
@@ -55,7 +54,6 @@ class Router: ObservableObject {
         routeStack = [.homeview]
         currentRoute = .homeview
         
-        // Debug
         print("Resetting to \(currentRoute ?? .homeview)")
     }
     

@@ -22,7 +22,7 @@ struct DotView: View {
         ZStack {
             DotARSessionContainer(viewModel: viewModel, showPreviewImage: showPreviewImage)
                 .ignoresSafeArea(.all)
-                .id("ARContainer_\(viewAppeared ? "active" : "inactive")") // Force refresh
+                .id("ARContainer_\(viewAppeared ? "active" : "inactive")") 
             
             VStack {
                 Text(viewModel.warningMessage)
@@ -100,17 +100,25 @@ struct DotView: View {
         .navigationBarTitleDisplayMode(.automatic)
         .navigationBarBackButtonHidden(true)
         .onAppear {
-            viewAppeared = true
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                sessionManager.resumeSession()
-                sessionManager.applyAsset(asset, type: .dot)
-            }
+            handleDotSession()
         }
         .onDisappear {
-            viewAppeared = false
-            viewModel.stopMonitoring() // Stop monitoring
-            viewModel.stopHaptic() // Stop haptic
+            handleDotViewModelOnDisappear()
         }
+    }
+    
+    private func handleDotSession() {
+        viewAppeared = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            sessionManager.resumeSession()
+            sessionManager.applyAsset(asset, type: .dot)
+        }
+    }
+    
+    private func handleDotViewModelOnDisappear() {
+        viewAppeared = false
+        viewModel.stopMonitoring() // Stop monitoring
+        viewModel.stopHaptic() // Stop haptic
     }
 }
