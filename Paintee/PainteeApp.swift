@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct PainteeApp: App {
     @StateObject private var router = Router()
+    @StateObject private var purchaseManager = PurchaseManager()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     var body: some Scene {
         WindowGroup {
@@ -20,6 +21,7 @@ struct PainteeApp: App {
             }
         }
         .environmentObject(router)
+        .environmentObject(purchaseManager)
     }
 }
 

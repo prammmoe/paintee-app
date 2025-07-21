@@ -14,6 +14,7 @@ struct FacePaintingAsset: Hashable, Equatable, Identifiable {
     var dotPreviewImage: String
     var outlinePreviewImage: String
     var homeImage: String
+    var isLocked: Bool = false
     
     static func assetData() -> [FacePaintingAsset] {
         return [
@@ -51,6 +52,25 @@ struct FacePaintingAsset: Hashable, Equatable, Identifiable {
                 outlinePreviewImage: "HeroOutline",
                 homeImage: "design4"
             ),
+            // Dia Muertos
+            FacePaintingAsset(
+                name: "Dia Muertos",
+                previewImage: "Dia Muertos",
+                dotPreviewImage: "MuertosDot",
+                outlinePreviewImage: "MuertosOutline",
+                homeImage: "design5",
+                isLocked: true,
+            ),
+            // Tiger
+            FacePaintingAsset(
+                name: "Tiger",
+                previewImage: "Tiger",
+                dotPreviewImage: "TigerDot",
+                outlinePreviewImage: "TigerOutline",
+                homeImage: "design6",
+                isLocked: true
+            ),
+            
         ]
     }
 }
